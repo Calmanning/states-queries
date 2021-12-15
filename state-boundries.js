@@ -1,4 +1,3 @@
-console.log("Let's build another map")
 
 require([
         "esri/config",
@@ -43,8 +42,8 @@ require([
         stateSelectUI.setAttribute("class","esri-widget");
         stateSelectUI.setAttribute("style", "width: 200px; font-family: 'Avenir-Next'; fonst-size: 1em;")
 
-        stateSelectUI.innerHTML = stateList.map((entry) => {
-            return `<option>${entry}</option>`
+    const stateSelectChoices = stateSelectUI.innerHTML = stateList.map((entry) => {
+            return `<option> STATE_ABBR = '${entry}'</option>`
         })
 
     view.ui.add(stateSelectUI, "top-right");
@@ -75,19 +74,18 @@ require([
     featureLayer.load().then(() => {
         view.extent = featureLayer.fullExtent;
         featureLayer.popupTemplate = featureLayer.createPopupTemplate({
-                visibleFieldNames: new Set(["STATE_NAME", "SUB_REGION"])
+                visibleFieldNames: new Set(["STATE_NAME", "SUB_REGION", "STATE_ABBR", "POPULATION"]),
+                title: "{STATE_NAME}"
             }
         );
-        //look into the popupTemplate function
+        //look into the popupTemplate & createPopupTemplate function
     });
 
     view.on("click", (event) => {
         view.graphics.remove(pointSelectedGraphic);
-        view.popup.clear();
         if (view.graphics.includes(selectedOutlineGraphic)){
             view.graphics.remove(selectedOutlineGraphic);
         }
-        
         queryFeature(event)
     })
 
@@ -95,16 +93,19 @@ require([
 
     //eventlistener for the state selector. Currently it calls the same queryt as the onClick event does. I think I'll need to build a new query for this selector.
     stateSelectUI.addEventListener("change", (event) => {
-        stateSelected = `${event.target.value}`
-        console.log(stateSelected)
-        queryFeature(stateSelected);
+        stateSelected = event.target.value
+        view.graphics.remove(pointSelectedGraphic);
+        if (view.graphics.includes(selectedOutlineGraphic)){
+            view.graphics.remove(selectedOutlineGraphic);
+        }
+        selectQuery(stateSelected);
     });
     
      
     const queryFeature = function queryFeatures(pointClickedEvent){
-        const point = view.toMap(pointClickedEvent)
+        const point = view.toMap(pointClickedEvent) 
         featureLayer.queryFeatures({
-            // Where: stateSelected, -- Tried using this to include the stateSelector options. It doesn't work. Get an error -- 'unable to preform query. Check your parameters'
+            //  -- Tried using this to include the stateSelector options. It doesn't work. Get an error -- 'unable to preform query. Check your parameters'
             geometry: point,
             distance: null,
             units: null,
@@ -114,9 +115,8 @@ require([
             outFields: ["*"]
         })
         .then((queryResults) => {
-            console.log(queryResults.features[0].attributes.STATE_ABBR);
-            // this wont work...for the most part. It will set the slector's option to whichever state is selected,but I will destroy the existing list. have to find a non-desctructive way of doing this.
-            stateSelectUI.innerHTML = `<option>${queryResults.features[0].attributes.STATE_ABBR} </option>`
+            console.log()
+            stateSelectUI.innerHTML = [`<option>  STATE_ABBR = '${queryResults.features[0].attributes.STATE_ABBR}' </option>`, ...stateSelectChoices]
             pointSelectedGraphic.geometry = point;
             view.graphics.add(pointSelectedGraphic)
             view.popup.open({
@@ -124,10 +124,32 @@ require([
                 features: queryResults.features,
                 featureMenuOpen: true,
             })
-            if (queryResults.queryGeometry){
-                selectedOutlineGraphic.geometry = queryResults.queryGeometry;
-                view.graphics.add(selectedOutlineGraphic);
-            }
+            // if (queryResults.queryGeometry){
+            //     selectedOutlineGraphic.geometry = queryResults.queryGeometry;
+            //     view.graphics.add(selectedOutlineGraphic);
+            // }
         });
     }
+
+    const selectQuery = function query(stateSelected){
+        featureLayer.queryFeatures({
+            where: stateSelected,
+            spatialRelationship: "intersects",
+            returnGeometry: true,
+            returnQueryGeometry: true,
+            outFields:["*"]
+        }).then((queryResults) => {
+            view.graphics.add(selectedOutlineGraphic);
+            view.popup.open({
+                location: selectedOutlineGraphic.geometry,
+                features: queryResults.features,
+                featureMenuOpen: true,
+            })
+            // if (queryResults.queryGeometry){
+            //     selectedOutlineGraphic.geometry = queryResults.queryGeometry;
+            //     view.graphics.add(selectedOutlineGraphic);
+            // }
+        });
+    }
+
 })
