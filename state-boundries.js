@@ -9,17 +9,22 @@ require([
 
     esriConfig.apiKey = "AAPK115d19ab66264ef1b7cdbdd54b6804f4whm-2t82h02UCQQ1zigAlbT-GPsbqzkH4Cd1xDjXtPoshgyibnsGBM4zg-eklxut"
     
-    const featureLayer = new FeatureLayer ({
+    const flStateBoundaries = new FeatureLayer ({
         url: "https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_States_Generalized/FeatureServer",
-        outFields: ["*"],
+        outFields: ["*"]
+        })
         
+        flCityPopulations = new FeatureLayer ({
+             url: "https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_Major_Cities/FeatureServer",
+                outfields: ["*"],
+                definitionExpression: ""
         })
 
     const map = new Map ({
         basemap: "arcgis-topographic",
-        layers: [featureLayer]
-        
-    })
+        layers: [flStateBoundaries, flCityPopulations]
+    });
+
     
     const view = new MapView({
         container: "viewDiv",
@@ -34,7 +39,9 @@ require([
                 }
             }
     });
-    view.map.add(featureLayer,0)
+    view.map.add(flCityPopulations, 1)
+    view.map.add(flStateBoundaries, 0)
+    
 
     const stateList = ["AK","CA","CO", "CT", "DE", "ME", "MI", "MT", "NY","OH", "OR", "PA", "UT", "WA"]
 
@@ -43,24 +50,13 @@ require([
         stateSelectUI.setAttribute("style", "width: 200px; font-family: 'Avenir-Next'; fonst-size: 1em;")
 
     const stateSelectChoices = stateSelectUI.innerHTML = stateList.map((entry) => {
-            return `<option> STATE_ABBR = '${entry}'</option>`
+            return `<option> ${entry} </option>`
         })
 
     view.ui.add(stateSelectUI, "top-right");
 
-    //establishing point-marker-graphic
-    const pointSelectedGraphic = new Graphic({
-        symbol: {
-            type: "simple-marker",
-            color: [150,0,139],
-            outline: {
-                color: [255, 255, 255],
-                width: 1.5
-            }
-        }
-    });
     //creating outline graphic of selected feature queried
-    const selectedOutlineGraphic = new Graphic ({
+    const stateOutlineGraphic = new Graphic ({
         symbol: {
             type: "simple-fill",
             color: [173, 216, 230, 0.2],
@@ -70,42 +66,36 @@ require([
             }
         }
     });
-
-    featureLayer.load().then(() => {
-        view.extent = featureLayer.fullExtent;
-        featureLayer.popupTemplate = featureLayer.createPopupTemplate({
-                visibleFieldNames: new Set(["STATE_NAME", "SUB_REGION", "STATE_ABBR", "POPULATION"]),
-                title: "{STATE_NAME}"
-            }
-        );
-        //look into the popupTemplate & createPopupTemplate function
-    });
-
-    view.on("click", (event) => {
-        view.graphics.remove(pointSelectedGraphic);
-        if (view.graphics.includes(selectedOutlineGraphic)){
-            view.graphics.remove(selectedOutlineGraphic);
+    
+    flCityPopulations.load().then(() => {
+        view.extent = flCityPopulations.fullExtent;
+    })
+    
+    flStateBoundaries.load().then(() => {
+        flStateBoundaries.popupTemplate = flStateBoundaries.createPopupTemplate({
+            visibleFieldNames: new Set(["STATE_NAME", "SUB_REGION", "STATE_ABBR", "POPULATION"]),
+            title: "{STATE_NAME}"
         }
-        queryFeature(event)
+        );
+    });
+    
+    //event listener for when a state on the map is clicked 
+    view.on("click", (event) => {
+        pointQuery(event)
     })
 
+    
     let stateSelected
-
-    //eventlistener for the state selector. Currently it calls the same queryt as the onClick event does. I think I'll need to build a new query for this selector.
+    //eventlistener for the state selector. 
     stateSelectUI.addEventListener("change", (event) => {
         stateSelected = event.target.value
-        view.graphics.remove(pointSelectedGraphic);
-        if (view.graphics.includes(selectedOutlineGraphic)){
-            view.graphics.remove(selectedOutlineGraphic);
-        }
         selectQuery(stateSelected);
     });
     
      
-    const queryFeature = function queryFeatures(pointClickedEvent){
+    const pointQuery = function queryClickedFeatures(pointClickedEvent){
         const point = view.toMap(pointClickedEvent) 
-        featureLayer.queryFeatures({
-            //  -- Tried using this to include the stateSelector options. It doesn't work. Get an error -- 'unable to preform query. Check your parameters'
+        flStateBoundaries.queryFeatures({
             geometry: point,
             distance: null,
             units: null,
@@ -115,41 +105,33 @@ require([
             outFields: ["*"]
         })
         .then((queryResults) => {
-            console.log()
-            stateSelectUI.innerHTML = [`<option>  STATE_ABBR = '${queryResults.features[0].attributes.STATE_ABBR}' </option>`, ...stateSelectChoices]
-            pointSelectedGraphic.geometry = point;
-            view.graphics.add(pointSelectedGraphic)
-            view.popup.open({
-                location: point,
-                features: queryResults.features,
-                featureMenuOpen: true,
-            })
-            // if (queryResults.queryGeometry){
-            //     selectedOutlineGraphic.geometry = queryResults.queryGeometry;
-            //     view.graphics.add(selectedOutlineGraphic);
-            // }
+            console.log(queryResults)
+            flCityPopulations.definitionExpression = `ST = '${queryResults.features[0].attributes.STATE_ABBR}'`
+            stateSelectUI.innerHTML = [`<option>${queryResults.features[0].attributes.STATE_ABBR}</option>`, ...stateSelectChoices]
+            addHighlight(queryResults)
         });
     }
-
-    const selectQuery = function query(stateSelected){
-        featureLayer.queryFeatures({
-            where: stateSelected,
+    const selectQuery = function querySelectedFeatures(stateSelected){
+        flCityPopulations.definitionExpression = `ST = '${stateSelected}'`
+        flStateBoundaries.queryFeatures({
+            where:  `STATE_ABBR = '${stateSelected}'`,
             spatialRelationship: "intersects",
-            returnGeometry: true,
+            returnGeometry: false,
             returnQueryGeometry: true,
             outFields:["*"]
         }).then((queryResults) => {
-            view.graphics.add(selectedOutlineGraphic);
-            view.popup.open({
-                location: selectedOutlineGraphic.geometry,
-                features: queryResults.features,
-                featureMenuOpen: true,
-            })
-            // if (queryResults.queryGeometry){
-            //     selectedOutlineGraphic.geometry = queryResults.queryGeometry;
-            //     view.graphics.add(selectedOutlineGraphic);
-            // }
+           view.graphics.add(stateOutlineGraphic);
+           addHighlight(queryResults)
         });
     }
 
-})
+    const addHighlight = function highlight(queryResults){
+        view.graphics.add(stateOutlineGraphic);
+        view.popup.open({
+                location: stateOutlineGraphic.geometry,
+                features: queryResults.features,
+                featureMenuOpen: true,
+        });
+    }
+
+});
