@@ -49,8 +49,7 @@ require([
         stateSelectDropdown.setAttribute("class","test");
         stateSelectDropdown.setAttribute("style", "position: absolute; top: 50px; right: 30px; width: 200px; font-family: 'Avenir-Next'; fonst-size: 1em;")
         document.body.appendChild(stateSelectDropdown);
-
-        
+    
     const createStateDropdownList = (list) => {
         stateSelectChoices = list.map((entry) => {
             return `<option> ${entry} </option>`
@@ -59,45 +58,45 @@ require([
     }
     createStateDropdownList(stateList)
     
-    //this is the start of the filtered city list-table. Now here's the question: is it being implemented well? Is there another way to set this up, to compartmentalize it?
     const filteredCitiesList = document.createElement("table")
-    const cityListTableBody = document.createElement("tbody")
-
-    const createFilterCitiesList = (cityQueryResults) => {
         filteredCitiesList.setAttribute("class", "table");
-        filteredCitiesList.setAttribute("style", "font-family: 'Avenir-Next'; font-size: 1em;")
-        //need to map over the query results to get the city names. 
+        filteredCitiesList.setAttribute("style", "height:30vw; width: 50vw; margin: 0 auto; border: 3px solid black; font-family: 'Avenir-Next'; font-size: 1em;")
+    const cityListTableBody = document.createElement("tbody")
+        cityListTableBody.setAttribute("style", "height:300px; overflow-y:auto;")
+    
+    const createCityListTableHead = (cityQueryResults) => {
+        let tableHeadings = Object.keys(cityQueryResults.features[0].attributes).map((headers) => {
+            return `<td>${headers}</td>`
+        }).join("")
+
         document.body.appendChild(filteredCitiesList)
         filteredCitiesList.appendChild(cityListTableBody)
-        createCityListTableEntries(cityQueryResults)
-
+        createCityListTableEntries(cityQueryResults, tableHeadings)
     }
 
-    //map over results here? or no?
-    const createCityListTableEntries = (cityQueryResults)=>{
-            cityList = cityQueryResults.features.map((cities) => {
-             console.log(cities.attributes.NAME)
-             return `<tr>${cities.attributes.NAME}</tr>`
-        }).join("")
-       cityListTableBody.innerHTML = cityList
-       // should I call the table creation here?
-        // createFilterCitiesList(cityEntries)
+    const createCityListTableEntries = (cityQueryResults, tableHeadings)=>{
+        let cityList = Object.values(cityQueryResults.features).map((city) => {
+            return (
+                `<tr>
+                <td>${Object.values(city.attributes)[0]}</td>
+                <td>${Object.values(city.attributes)[1]}</td>
+                </tr>`)
+                }).join("")
+        
+       cityListTableBody.innerHTML = `<tr>${tableHeadings}</tr> ${cityList}`
     }
-
         
     flCityPopulations.load().then(() => {
         view.extent = flCityPopulations.fullExtent;
     })
     
+    //the visibleFieldNames here determine what is shown in the popup.
     flStateBoundaries.load().then(() => {
         flStateBoundaries.popupTemplate = flStateBoundaries.createPopupTemplate({
             visibleFieldNames: new Set(["STATE_NAME", "SUB_REGION", "STATE_ABBR", "POPULATION"]),
-            title: "{STATE_NAME}"
-        }
-        );
+        });
     });
     
-    //creating outline graphic of selected feature queried
     const stateOutlineGraphic = new Graphic ({
         symbol: {
             type: "simple-fill",
@@ -121,29 +120,19 @@ require([
         setState(event.target.value)
     });
     
-    //instantiating a placeholder for the state selected in the dropdown
-    //do I still need this placeholder?
-    let stateSelected
     const setState = (state) => {
-        stateSelected = state;
-        console.log(state)
         updateStateDropdownSelector(state);  
         filterCitiesByState(state);
         updateQuery(state)
     }
 
-    const filterCitiesByState = (state) => {
-                console.log(state)
-        const filteredCitiesWhereClause = `ST = '${state}'`      
-        flCityPopulations.definitionExpression = filteredCitiesWhereClause;
-        console.log(filteredCitiesWhereClause)
-        queryCitiesEditor(filteredCitiesWhereClause);
-    }
-
     const updateStateDropdownSelector = (state) => {
-                console.log(state)
-
         stateSelectDropdown.innerHTML = [`<option>${state}</option>`, ...stateSelectChoices]
+    }
+    
+    const filterCitiesByState = (state) => {
+        const filteredCitiesWhereClause = `ST = '${state}'`      
+        flCityPopulations.definitionExpression = filteredCitiesWhereClause;        queryCitiesEditor(filteredCitiesWhereClause);
     }
 
     const updateQuery = (state) => {
@@ -152,25 +141,24 @@ require([
     }
     
     const queryStatesEditor = ({mapPoint, stateQueryWhereClause}) => {
-        console.log(stateQueryWhereClause)
+        console.log(mapPoint)
         const queryTemplate = {
                 returnGeometry: true,
                 returnQueriedGeometry: true,
                 outFields: ["*"]
         }
         
-       let queryAdjustment = (stateQueryWhereClause) ? queryTemplate.where = stateQueryWhereClause : queryTemplate.geometry = mapPoint
+       let queryClauseAdjustment = (stateQueryWhereClause) ? queryTemplate.where = stateQueryWhereClause : queryTemplate.geometry = mapPoint
        
        statesQuery(queryTemplate)
     };
-
+    
+    //the outFields listed here will effect the table display outcomes
     const queryCitiesEditor = (filteredCitiesWhereClause) => {
-        console.log(filteredCitiesWhereClause)
         const queryTemplate = {
             where: filteredCitiesWhereClause,
-            outFields: ["NAME"]
+            outFields: ["NAME", "POPULATION"]
         }
-
         queryFilteredCities(queryTemplate)
     }
     
@@ -182,13 +170,10 @@ require([
                 featureMenuOpen: true,
         });
     }
-    
-    //re: the mapPoint click-event: still debating on wheter or not I should include some addtional function call (setState) in this function. Or if there is a way to call it earlier.
+    //I end up repeating myself here. "updateStateDropdownSelector" and "filterCitiesByState" both exist in the setState function at line101
     const statesQuery = (query) => {
-        console.log(query);
         flStateBoundaries.queryFeatures(query)
         .then((queryResults) => {
-            //This works, but I don't like it. It adds more complexicty where I don't really want it. And it could get complicated with any updates/changes.There has to be a better way.
             let stateAbbreviation = queryResults.features[0].attributes.STATE_ABBR
             updateStateDropdownSelector(stateAbbreviation);  
             filterCitiesByState(stateAbbreviation);
@@ -197,10 +182,9 @@ require([
     }
 
     const queryFilteredCities = (queryTemplate) => {
-        console.log(queryTemplate)
         flCityPopulations.queryFeatures(queryTemplate).
         then((queryResults) => {
-            createFilterCitiesList(queryResults)
+            createCityListTableHead(queryResults)
     })
 }
 
