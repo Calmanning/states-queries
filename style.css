@@ -1,3 +1,8 @@
+* {
+  font-family: Avenir Next;
+  font-size: 1em;
+}
+
 html,
 body,
 #viewDiv {
@@ -5,4 +10,26 @@ body,
   margin: 0;
   height: 100%;
   width: 100%;
+}
+
+#stateSelector {
+  position: absolute;
+  top: 50px;
+  right: 50px;
+  width: 100px;
+}
+
+#dataDiv {
+  position: absolute;
+  bottom: 50px;
+  left: 10px;
+  background-color: #f8f8f8;
+  margin: auto;
+  width: 40vw;
+  max-height: 25vh;
+  overflow: auto;
+}
+
+#cityList {
+  margin: auto;
 }

@@ -25,7 +25,6 @@ require([
         layers: [flStateBoundaries, flCityPopulations]
     });
 
-    
     const view = new MapView({
         container: "viewDiv",
         map: map,
@@ -46,9 +45,8 @@ require([
     const stateList = ["AK","CA","CO", "CT", "DE", "ME", "MI", "MT", "NY", "NV","OH", "OR", "PA", "UT", "WA"]
 
     const stateSelectDropdown = document.createElement("select")
-        stateSelectDropdown.setAttribute("class","test");
-        stateSelectDropdown.setAttribute("style", "position: absolute; top: 50px; right: 30px; width: 200px; font-family: 'Avenir-Next'; fonst-size: 1em;")
-        document.body.appendChild(stateSelectDropdown);
+        stateSelectDropdown.setAttribute("id","stateSelector");
+        document.getElementById("selectorDiv").append(stateSelectDropdown);
     
     const createStateDropdownList = (list) => {
         stateSelectChoices = list.map((entry) => {
@@ -57,35 +55,33 @@ require([
         stateSelectDropdown.innerHTML = stateSelectChoices
     }
     createStateDropdownList(stateList)
-    
-    const filteredCitiesList = document.createElement("table")
-        filteredCitiesList.setAttribute("class", "table");
-        filteredCitiesList.setAttribute("style", "height:30vw; width: 50vw; margin: 0 auto; border: 3px solid black; font-family: 'Avenir-Next'; font-size: 1em;")
-    const cityListTableBody = document.createElement("tbody")
-        cityListTableBody.setAttribute("style", "height:300px; overflow-y:auto;")
-    
-    const createCityListTableHead = (cityQueryResults) => {
-        let tableHeadings = Object.keys(cityQueryResults.features[0].attributes).map((headers) => {
-            return `<td>${headers}</td>`
-        }).join("")
-
-        document.body.appendChild(filteredCitiesList)
-        filteredCitiesList.appendChild(cityListTableBody)
-        createCityListTableEntries(cityQueryResults, tableHeadings)
+        
+    const createCityListHeadings = (cityQueryResults) => {
+        let dataHeadings = Object.keys(cityQueryResults.features[0].attributes).map((headers) => {
+            return `<span>${headers}</span>`
+        }).join(" ")
+        
+        createCityListEntries(cityQueryResults, dataHeadings)
     }
-
-    const createCityListTableEntries = (cityQueryResults, tableHeadings)=>{
-        let cityList = Object.values(cityQueryResults.features).map((city) => {
+    
+    const cityListData = document.createElement("div")
+          cityListData.setAttribute("id", "cityList")  
+    //come back to this later.
+    const createCityListEntries = (cityQueryResults, dataHeadings)=>{
+        let cityList = cityQueryResults.features.map((city) => {
+            let property = city.attributes
+            
+            let { [ Object.keys(property)[0] ]: town } = city.attributes
+            let { [ Object.keys(city.attributes)[1] ]: population } = city.attributes
+            console.log(town)
             return (
-                `<tr>
-                <td>${Object.values(city.attributes)[0]}</td>
-                <td>${Object.values(city.attributes)[1]}</td>
-                </tr>`)
-                }).join("")
-        
-       cityListTableBody.innerHTML = `<tr>${tableHeadings}</tr> ${cityList}`
+                `<p>${town}: ${population}</p>`)
+            }).join("")
+            
+       document.getElementById("dataDiv").append(cityListData)
+       cityListData.innerHTML = `<h3>${dataHeadings}</h3>${cityList}`
     }
-        
+
     flCityPopulations.load().then(() => {
         view.extent = flCityPopulations.fullExtent;
     })
@@ -108,51 +104,48 @@ require([
         }
     });
         
-    //event listener for when a state on the map is clicked 
     view.on("click", ({ mapPoint }) => {
         queryStatesEditor({ mapPoint, stateSelected: null })
         console.log(mapPoint)
 
     })
 
-    //eventlistener for the state selector. 
     stateSelectDropdown.addEventListener("change", (event) => {
-        setState(event.target.value)
+        updateQuery(event.target.value)
     });
     
     const setState = (state) => {
         updateStateDropdownSelector(state);  
-        filterCitiesByState(state);
-        updateQuery(state)
+        filterCitiesByState(state); 
     }
-
+    
     const updateStateDropdownSelector = (state) => {
         stateSelectDropdown.innerHTML = [`<option>${state}</option>`, ...stateSelectChoices]
     }
     
+    const updateQuery = (state) => {
+         const stateQueryWhereClause = `STATE_ABBR = '${state}'`
+         queryStatesEditor({stateQueryWhereClause});
+        }
+        
+    const queryStatesEditor = ({mapPoint, stateQueryWhereClause}) => {
+        
+        const queryTemplate = {
+            returnGeometry: true,
+            returnQueriedGeometry: true,
+            outFields: ["*"]
+        }
+        
+        let queryClauseAdjustment = (stateQueryWhereClause) ? queryTemplate.where = stateQueryWhereClause : queryTemplate.geometry = mapPoint
+    
+        statesQuery(queryTemplate)
+    };
+        
     const filterCitiesByState = (state) => {
         const filteredCitiesWhereClause = `ST = '${state}'`      
         flCityPopulations.definitionExpression = filteredCitiesWhereClause;        queryCitiesEditor(filteredCitiesWhereClause);
     }
 
-    const updateQuery = (state) => {
-         const stateQueryWhereClause = `STATE_ABBR = '${state}'`
-         queryStatesEditor({stateQueryWhereClause});
-    }
-    
-    const queryStatesEditor = ({mapPoint, stateQueryWhereClause}) => {
-        console.log(mapPoint)
-        const queryTemplate = {
-                returnGeometry: true,
-                returnQueriedGeometry: true,
-                outFields: ["*"]
-        }
-        
-       let queryClauseAdjustment = (stateQueryWhereClause) ? queryTemplate.where = stateQueryWhereClause : queryTemplate.geometry = mapPoint
-       
-       statesQuery(queryTemplate)
-    };
-    
     //the outFields listed here will effect the table display outcomes
     const queryCitiesEditor = (filteredCitiesWhereClause) => {
         const queryTemplate = {
@@ -170,13 +163,12 @@ require([
                 featureMenuOpen: true,
         });
     }
-    //I end up repeating myself here. "updateStateDropdownSelector" and "filterCitiesByState" both exist in the setState function at line101
+    
     const statesQuery = (query) => {
         flStateBoundaries.queryFeatures(query)
         .then((queryResults) => {
-            let stateAbbreviation = queryResults.features[0].attributes.STATE_ABBR
-            updateStateDropdownSelector(stateAbbreviation);  
-            filterCitiesByState(stateAbbreviation);
+            let stateName = queryResults.features[0].attributes.STATE_ABBR
+            setState(stateName);  
             addStateHighlight(queryResults)
         });
     }
@@ -184,7 +176,7 @@ require([
     const queryFilteredCities = (queryTemplate) => {
         flCityPopulations.queryFeatures(queryTemplate).
         then((queryResults) => {
-            createCityListTableHead(queryResults)
+            createCityListHeadings(queryResults)
     })
 }
 
