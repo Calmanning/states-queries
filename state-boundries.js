@@ -96,65 +96,18 @@ require([
     );
     
 
-    const mapViewBtn = document.createElement("button");
-    mapViewBtn.setAttribute("id", "mapViewBtn");
-    mapViewBtn.innerHTML = (viewToggle) 
-        ? "MapView on" 
-        : "MapView off"
-    mapViewBtn.value = viewToggle
-    document.getElementById("btnDiv").append(mapViewBtn);
-
-    //in it's current state, almost everything the stateSelectDropdown could be it's own separate file-component.
-    const stateList = ["AK","CA","CO", "CT", "DE", "ME", "MI", "MT", "NY", "NV","OH", "OR", "PA", "UT", "WA"]
-    
-    const stateSelectDropdown = document.createElement("select")
-        stateSelectDropdown.setAttribute("id","stateSelector");
-        document.getElementById("selectorDiv").append(stateSelectDropdown);
-    
-    const populateStateDropdownList = (list) => {
-        
-        stateSelectChoices = list.map((entry) => {
-            
-            return `<option> ${entry} </option>`
-        });
-        
-        stateSelectDropdown.innerHTML = stateSelectChoices;
-    };
-
-    populateStateDropdownList(stateList)
+    // const mapViewBtn = document.createElement("button");
+    // mapViewBtn.setAttribute("id", "mapViewBtn");
+    // mapViewBtn.innerHTML = (viewToggle) 
+    //     ? "MapView on" 
+    //     : "MapView off"
+    // mapViewBtn.value = viewToggle
+    // document.getElementById("btnDiv").append(mapViewBtn);
     
     stateSelectDropdown.addEventListener("change", (event) => {
         
         setState(event.target.value);
     });
-
-    // const getCityListHeadings = (cityQueryResults) => {
-        
-    //     let containerHeadings = Object.keys(cityQueryResults.features[0].attributes).map((headers) => {
-    //         return `<span>${headers}</span>`
-    //     }).join(" ")
-        
-    //     getCityListEntries(cityQueryResults, containerHeadings)
-    // };
-    
-    // const cityListContainer = document.createElement("div")
-    //   cityListContainer.setAttribute("id", "cityList")  
-
-    // const getCityListEntries = (cityQueryResults, containerHeadings)=>{
-    //     let cityList = cityQueryResults.features.map((city) => {
-            
-    //         let town = city.attributes.NAME
-    
-    //         let population  = city.attributes.POPULATION
-
-    //         return (
-    //             `<p>${town}: ${population}</p>`
-    //         )
-    //     }).join("");
-            
-    //    document.getElementById("dataDiv").append(cityListContainer);
-    //    cityListContainer.innerHTML = `<h3>${containerHeadings}</h3>${cityList}`
-    // };
     
     //this function, calling other functions would stay.
     const setState = (state) => {
