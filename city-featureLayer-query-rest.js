@@ -15,7 +15,7 @@ arcgisRest.queryFeatures(
 then(response => {
         console.log(response)
 })
-
+// NOTE: still need to get the city point locations to appear on the map
 function getCitiesFromState(state){
     arcgisRest.queryFeatures(
         {
