@@ -1,3 +1,4 @@
+
 require([
         "esri/config",
         "esri/Map",
@@ -15,24 +16,24 @@ require([
         }
     );
         
-    // const flCityPopulations = new FeatureLayer (
-    //     {
-    //         url: 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_Major_Cities/FeatureServer',
-    //         outfields: ["*"],
-    //         definitionExpression: ""
-    //     }
-    //     );
+     const flCityPopulations = new FeatureLayer (
+         {
+             url: 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_Major_Cities/FeatureServer',
+             outfields: ["*"],
+             definitionExpression: ""
+         }
+         );
 
     const map = new Map (
         {
             basemap: "arcgis-topographic",
             layers: [flStateBoundaries, 
-                    //  flCityPopulations
+                     flCityPopulations
             ]
         }
     );
     map.add(flStateBoundaries, 0)
-    // map.add(flCityPopulations, 1)
+    map.add(flCityPopulations, 1)
 
     
     const viewBuilder =(viewToggle) => {
@@ -128,33 +129,33 @@ require([
         setState(event.target.value);
     });
 
-    // const getCityListHeadings = (cityQueryResults) => {
+    const getCityListHeadings = (cityQueryResults) => {
         
-    //     let containerHeadings = Object.keys(cityQueryResults.features[0].attributes).map((headers) => {
-    //         return `<span>${headers}</span>`
-    //     }).join(" ")
+        let containerHeadings = Object.keys(cityQueryResults.features[0].attributes).map((headers) => {
+            return `<span>${headers}</span>`
+        }).join(" ")
         
-    //     getCityListEntries(cityQueryResults, containerHeadings)
-    // };
+        getCityListEntries(cityQueryResults, containerHeadings)
+    };
     
-    // const cityListContainer = document.createElement("div")
-    //   cityListContainer.setAttribute("id", "cityList")  
+    const cityListContainer = document.createElement("div")
+      cityListContainer.setAttribute("id", "cityList")  
 
-    // const getCityListEntries = (cityQueryResults, containerHeadings)=>{
-    //     let cityList = cityQueryResults.features.map((city) => {
+    const getCityListEntries = (cityQueryResults, containerHeadings)=>{
+        let cityList = cityQueryResults.features.map((city) => {
             
-    //         let town = city.attributes.NAME
+            let town = city.attributes.NAME
     
-    //         let population  = city.attributes.POPULATION
+            let population  = city.attributes.POPULATION
 
-    //         return (
-    //             `<p>${town}: ${population}</p>`
-    //         )
-    //     }).join("");
+            return (
+                `<p>${town}: ${population}</p>`
+            )
+        }).join("");
             
-    //    document.getElementById("dataDiv").append(cityListContainer);
-    //    cityListContainer.innerHTML = `<h3>${containerHeadings}</h3>${cityList}`
-    // };
+       document.getElementById("dataDiv").append(cityListContainer);
+       cityListContainer.innerHTML = `<h3>${containerHeadings}</h3>${cityList}`
+    };
     
     //this function, calling other functions would stay.
     const setState = (state) => {
@@ -165,7 +166,7 @@ require([
 
         updateStateDropdownSelector(state);
 
-        getCitiesFromState(state);
+        filterCitiesByState(state);
         
         updateQuery(state);
     };
