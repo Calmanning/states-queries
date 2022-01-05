@@ -1,3 +1,5 @@
+//NOTE: experimenting with removing components from this file. certain components have been commented out for testing. 
+
 require([
         "esri/config",
         "esri/Map",
@@ -15,71 +17,46 @@ require([
         }
     );
         
-    // const flCityPopulations = new FeatureLayer (
-    //     {
-    //         url: 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_Major_Cities/FeatureServer',
-    //         outfields: ["*"],
-    //         definitionExpression: ""
-    //     }
-    //     );
-
     const map = new Map (
         {
             basemap: "arcgis-topographic",
             layers: [flStateBoundaries, 
-                    //  flCityPopulations
             ]
         }
     );
     map.add(flStateBoundaries, 0)
-    // map.add(flCityPopulations, 1)
-
     
-    const viewBuilder =(viewToggle) => {
-        if(viewToggle){
-            view = new MapView(
-                {
-                    container: "viewDiv",
-                    map: map,
-                    center: [-112, 50], 
-                    zoom: 4, 
-                    popup: {
-                        autoOpenEnabled: false,
-                        dockEnabled: true,
-                        dockOptions: {
-                            buttonEnabled: true,
-                            breakpoint: false,
-                            position: "bottom-right"
-                        }
-                    } 
+    const view = new MapView(
+        {
+            container: "viewDiv",
+            map: map,
+            center: [-112, 50], 
+            zoom: 4, 
+            popup: {
+                autoOpenEnabled: false,
+                dockEnabled: true,
+                dockOptions: {
+                    buttonEnabled: true,
+                    breakpoint: false,
+                    position: "bottom-right"
                 }
-            );
-        };
-    };
-    
-    //variable that dictates whether or not the mapView will render
-    let viewToggle = true
-    viewBuilder(viewToggle)
-    
-    if(viewToggle) {
+            } 
+        }
+    );    
         
-        view.on("click", ({ mapPoint }) => {
-            queryStatesEditor({ mapPoint, stateSelected: null })
-        })
-    }
-
+    
     //the visibleFieldNames here determine what is shown in the popup. Which is currently displayed on the layerView
     flStateBoundaries.load().
-        then(() => {
-            flStateBoundaries.popupTemplate = flStateBoundaries.createPopupTemplate({
-                visibleFieldNames: new Set([
-                                            "STATE_NAME", 
-                                            "SUB_REGION", 
-                                            "STATE_ABBR", 
-                                            "POPULATION"
-                ]),
-            });
+    then(() => {
+        flStateBoundaries.popupTemplate = flStateBoundaries.createPopupTemplate({
+            visibleFieldNames: new Set([
+                "STATE_NAME", 
+                "SUB_REGION", 
+                "STATE_ABBR", 
+                "POPULATION"
+            ]),
         });
+    });
     
     //this graphic get applied to the layerView
     const stateOutlineGraphic = new Graphic (
@@ -94,22 +71,17 @@ require([
             }
         }
     );
-    
+           
+    view.on("click", ({ mapPoint }) => {
+        queryStatesEditor({ mapPoint, stateSelected: null })
+    })
 
-    // const mapViewBtn = document.createElement("button");
-    // mapViewBtn.setAttribute("id", "mapViewBtn");
-    // mapViewBtn.innerHTML = (viewToggle) 
-    //     ? "MapView on" 
-    //     : "MapView off"
-    // mapViewBtn.value = viewToggle
-    // document.getElementById("btnDiv").append(mapViewBtn);
-    
     stateSelectDropdown.addEventListener("change", (event) => {
         
-        setState(event.target.value);
+    setState(event.target.value);
     });
     
-    //this function, calling other functions would stay.
+    // This is the event hub. This is what changes 'state'. It should remain in this file.
     const setState = (state) => {
 
         if(stateQueryResult){
@@ -121,14 +93,9 @@ require([
         getCitiesFromState(state);
         
         updateQuery(state);
+        
     };
     
-    const updateStateDropdownSelector = (state) => {
-        stateSelectDropdown.innerHTML = [
-                `<option>${state}</option>`, 
-                ...stateSelectChoices
-            ]
-    }
     
     const updateQuery = (state) => {
        
@@ -150,29 +117,6 @@ require([
             : queryTemplate.geometry = mapPoint
     
         statesQuery(queryTemplate, state)
-    };
-        
-    const filterCitiesByState = (state) => {
-        
-        const filteredCitiesWhereClause = `ST = '${state}'`;   
-        
-        flCityPopulations.definitionExpression = filteredCitiesWhereClause;        
-        
-        queryCitiesEditor(filteredCitiesWhereClause);
-    };
-
-    //the outFields listed here will effect the table display outcomes
-    const queryCitiesEditor = (filteredCitiesWhereClause) => {
-        
-        const queryTemplate = {
-            where: filteredCitiesWhereClause,
-            outFields: [
-                "NAME",
-                "POPULATION"
-            ]
-        }
-        
-        queryFilteredCities(queryTemplate)
     };
     
     const addStateHighlight = function highlight(queryResults) {
@@ -203,12 +147,5 @@ require([
                 setState(stateQueryResult.features[0].attributes.STATE_ABBR)
             });
         };
-
-    const queryFilteredCities = (queryTemplate) => {
-        flCityPopulations.queryFeatures(queryTemplate).
-            then((queryResults) => {
-                getCityListHeadings(queryResults)
-        });
-    };
 
 });
