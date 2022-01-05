@@ -1,4 +1,4 @@
-const stateList = ["AK","CA","CO", "CT", "DE", "ME", "MI", "MT", "NY", "NV","OH", "OR", "PA", "UT", "WA"]
+// const stateList = ["AK","CA","CO", "CT", "DE", "ME", "MI", "MT", "NY", "NV","OH", "OR", "PA", "UT", "WA"]
 
 const stateSelectDropdown = document.createElement("select")
     stateSelectDropdown.setAttribute("id","stateSelector");
@@ -10,6 +10,6 @@ const populateStateDropdownList = (list) => {
         return `<option> ${entry.attributes.STATE_ABBR} </option>`
     });
     
-    stateSelectDropdown.innerHTML = stateSelectChoices;
+    stateSelectDropdown.innerHTML = stateSelectChoices.sort();
 };
 
