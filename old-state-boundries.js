@@ -1,4 +1,5 @@
-
+//Original version of the application. All aspects needed to run the application are located here.
+// left document here for reference. Currently serves no purpose.
 require([
         "esri/config",
         "esri/Map",
