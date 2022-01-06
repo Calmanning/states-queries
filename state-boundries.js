@@ -70,8 +70,21 @@ require([
                 }
             }
         }
-    );
-           
+        );
+        
+    const addStatePopup = function highlight(queryResults) {
+        
+        view.popup.open(
+            {
+                location: stateOutlineGraphic.geometry,
+                features: queryResults.features,
+                featureMenuOpen: true,
+            }
+        );
+        
+        view.graphics.add(stateOutlineGraphic);
+    };
+    
     view.on("click", ({ mapPoint }) => {
         queryStatesEditor({ mapPoint, stateSelected: null })
     })
@@ -81,71 +94,61 @@ require([
     setState(event.target.value);
     });
     
+
     // This is the event hub. This is what changes 'state'. It should remain in this file.
-    const setState = (state) => {
+    const setState = (state, stateQueryResult) => {
 
         if(stateQueryResult){
-            addStateHighlight(stateQueryResult)
+            addStatePopup(stateQueryResult)
         };
 
         updateStateDropdownSelector(state);
-
+        
         getCitiesFromState(state);
         
         updateQuery(state);
+        console.log(updateQuery(state))
         
     };
     
     
-    const updateQuery = (state) => {
+    // const updateQuery = (state) => {
        
-        const stateQueryWhereClause = `STATE_ABBR = '${state}'`
+    //     const stateQueryWhereClause = `STATE_ABBR = '${state}'`
         
-        queryStatesEditor({stateQueryWhereClause, state});
-    }
+    //     queryStatesEditor({stateQueryWhereClause, state});
+    // }
         
-    const queryStatesEditor = ({mapPoint, stateQueryWhereClause, state}) => {
+    // const queryStatesEditor = ({mapPoint, stateQueryWhereClause, state}) => {
         
-        const queryTemplate = {
-            returnGeometry: true,
-            returnQueriedGeometry: true,
-            outFields: ["*"]
-        }
+    //     const queryTemplate = {
+    //         returnGeometry: true,
+    //         returnQueriedGeometry: true,
+    //         outFields: ["*"]
+    //     }
         
-        let queryClauseAdjustment = (stateQueryWhereClause) 
-            ? queryTemplate.where = stateQueryWhereClause 
-            : queryTemplate.geometry = mapPoint
+    //     let queryClauseAdjustment = (stateQueryWhereClause) 
+    //         ? queryTemplate.where = stateQueryWhereClause 
+    //         : queryTemplate.geometry = mapPoint
     
-        statesQuery(queryTemplate, state)
-    };
+    //     statesQuery(queryTemplate, state)
+    // };
     
-    const addStateHighlight = function highlight(queryResults) {
-        
-        view.graphics.add(stateOutlineGraphic);
-        
-        view.popup.open(
-            {
-                location: stateOutlineGraphic.geometry,
-                features: queryResults.features,
-                featureMenuOpen: true,
-            }
-        );
-    };
     
     let stateQueryResult = null;
 
-    const statesQuery = (query, state) => {
+    // const statesQuery = (query, state) => {
 
-        if(stateQueryResult && 
-           stateQueryResult.features[0].attributes.STATE_ABBR === state) {
-            return
-        };
+    //     if(stateQueryResult && 
+    //        stateQueryResult.features[0].attributes.STATE_ABBR === state) {
+    //         return
+    //     };
 
-        flStateBoundaries.queryFeatures(query)
-            .then((queryResults) => {
-                stateQueryResult = queryResults;
-                setState(stateQueryResult.features[0].attributes.STATE_ABBR)
-            });
-        };
+    //     flStateBoundaries.queryFeatures(query)
+    //         .then((queryResults) => {
+    //             stateQueryResult = queryResults;
+    //             setState(stateQueryResult.features[0].attributes.STATE_ABBR, stateQueryResult)
+    //         });
+    //     };
 
 });

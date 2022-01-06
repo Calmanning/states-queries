@@ -1,5 +1,14 @@
 const cityListContainer = document.createElement("div")
     cityListContainer.setAttribute("id", "cityList")  
+    
+function getCityListHeadings(cityQueryResults){
+        
+        let containerHeadings = Object.keys(cityQueryResults.features[0].attributes).map((headers) => {
+            return `<span>${headers}</span>`
+        }).join(" ")
+        
+        getCityListEntries(cityQueryResults, containerHeadings)
+};
 
 const getCityListEntries = (cityQueryResults, containerHeadings)=>{
     let cityList = cityQueryResults.features.map((city) => {
@@ -16,11 +25,3 @@ const getCityListEntries = (cityQueryResults, containerHeadings)=>{
     cityListContainer.innerHTML = `<h3>${containerHeadings}</h3>${cityList}`
 };
 
-function getCityListHeadings(cityQueryResults){
-        
-        let containerHeadings = Object.keys(cityQueryResults.features[0].attributes).map((headers) => {
-            return `<span>${headers}</span>`
-        }).join(" ")
-        
-        getCityListEntries(cityQueryResults, containerHeadings)
-};

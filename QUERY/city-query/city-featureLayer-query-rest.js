@@ -10,7 +10,6 @@ function getCitiesFromState(state){
         returnGeometry: true
         }
     ).then(response => {
-        console.log(response)
         getCityListHeadings(response)
     }).catch(err => {
         console.log(err)
