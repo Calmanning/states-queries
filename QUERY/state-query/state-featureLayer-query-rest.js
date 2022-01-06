@@ -11,18 +11,22 @@ then(response => {
         populateStateDropdownList(response.features)
 });
 
-function statesQuery(query, state) {
+function statesQuery(query, callback) {
     console.log(query)
     
-    arcgisRest.queryFeatures(
-        query
-    ).
+    arcgisRest.queryFeatures(query).
     then(response => {
-        console.log(response)
-        return response
-    }).catch((err) => {
+        
+        let res = response
+        console.log(res)
+        callback(res)
+    }).
+    catch((err) => {
+        
         console.log(err)
     })
+
+    //NOTE: To be used later. Left for reference.
     // if(stateQueryResult && 
     //     stateQueryResult.features[0].attributes.STATE_ABBR === state) {
     //     return

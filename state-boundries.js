@@ -73,20 +73,21 @@ require([
         );
         
     const addStatePopup = function highlight(queryResults) {
-        
+        view.graphics.add(stateOutlineGraphic);
+        console.log(queryResults)
         view.popup.open(
             {
                 location: stateOutlineGraphic.geometry,
-                features: queryResults.features,
+                features: queryResults,
                 featureMenuOpen: true,
             }
         );
         
-        view.graphics.add(stateOutlineGraphic);
     };
     
     view.on("click", ({ mapPoint }) => {
         queryStatesEditor({ mapPoint, stateSelected: null })
+        console.log(queryStatesEditor({ mapPoint, stateSelected: null }))
     })
 
     stateSelectDropdown.addEventListener("change", (event) => {
@@ -99,15 +100,21 @@ require([
     const setState = (state, stateQueryResult) => {
 
         if(stateQueryResult){
+            
             addStatePopup(stateQueryResult)
         };
+
+        if(stateQueryResult && 
+         stateQueryResult.features[0].attributes.STATE_ABBR === state) {
+         return
+         }
 
         updateStateDropdownSelector(state);
         
         getCitiesFromState(state);
         
-        updateQuery(state);
-        console.log(updateQuery(state))
+        updateQuery(state, updateStateQueryResult);
+        
         
     };
     
@@ -136,6 +143,12 @@ require([
     
     
     let stateQueryResult = null;
+    function updateStateQueryResult(callbackResponse){
+        stateQueryResult = callbackResponse
+        console.log(stateQueryResult.features[0].attributes.STATE_ABBR)
+        setState(stateQueryResult.features[0].attributes.STATE_ABBR, stateQueryResult)
+    }
+
 
     // const statesQuery = (query, state) => {
 

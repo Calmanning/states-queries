@@ -1,5 +1,4 @@
-function queryStatesEditor({mapPoint, stateQueryWhereClause, state}) {
-    console.log(mapPoint)
+function queryStatesEditor({mapPoint, stateQueryWhereClause, state}, callback) {
 
 
     const queryTemplate = {
@@ -15,6 +14,6 @@ function queryStatesEditor({mapPoint, stateQueryWhereClause, state}) {
 
     queryTemplate.url = stateBoudariesLayerUrl;
 
-    statesQuery(queryTemplate, state)
+    statesQuery(queryTemplate, callback)
 
     };
