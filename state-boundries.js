@@ -84,7 +84,19 @@ require([
         }
         );
         
-    
+    const addStatePopup = function highlight(queryResults) {
+       
+        view.graphics.add(stateOutlineGraphic);
+        
+        view.popup.open(
+            {
+                location: stateOutlineGraphic.geometry,
+                features: queryResults.features,
+                featureMenuOpen: true,
+            }
+        );
+        
+    };
     
     view.on("click", ({mapPoint}) => {
     
@@ -100,12 +112,9 @@ require([
     
     // This is the event hub. This is what changes 'state'. It should remain in this file.
     const setState = (state, stateQueryResult) => {
-        console.log(state)
-        
-        
+                
         if(stateQueryResult){
-            console.log("test")
-            addStatePopup(stateQueryResult, stateOutlineGraphic)
+            addStatePopup(stateQueryResult)
         };
 
         renderCitiesToView(state)
@@ -114,15 +123,13 @@ require([
         
         getCitiesFromState(state);
 
-        queryStatesEditor(state, statesQuery)
+        queryStatesFeatureViewEditor(state, statesFeatureViewQuery)
             
     };
     
-    
     let stateQueryResult = null;
 
-
-    const statesQuery = (query, state) => {
+    const statesFeatureViewQuery = (query, state) => {
 
         if(stateQueryResult && 
            stateQueryResult.features[0].attributes.STATE_ABBR === state) {

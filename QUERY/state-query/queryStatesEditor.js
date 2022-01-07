@@ -1,4 +1,4 @@
-function queryStatesEditor(state, statesQuery) {
+const queryStatesFeatureViewEditor = (state, statesFeatureViewQuery) => {
 
     const queryTemplate = {
         
@@ -7,13 +7,7 @@ function queryStatesEditor(state, statesQuery) {
         returnQueriedGeometry: true,
         outFields: ["*"]
     }
-    
-    // let queryClauseAdjustment = (stateQueryWhereClause) 
-    //     ? queryTemplate.where = stateQueryWhereClause 
-    //     : queryTemplate.geometry = mapPoint;
 
-    // queryTemplate.url = stateBoudariesLayerUrl;
-
-    statesQuery(queryTemplate, state)
+    statesFeatureViewQuery(queryTemplate, state)
 
     };
