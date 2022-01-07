@@ -1,4 +1,3 @@
-//NOTE: experimenting with removing components from this file. certain components have been commented out for testing. 
 
 require([
         "esri/config",
@@ -60,6 +59,7 @@ require([
     //the visibleFieldNames here determine what is shown in the popup. Which is currently displayed on the layerView
     flStateBoundaries.load().
     then(() => {
+        
         flStateBoundaries.popupTemplate = flStateBoundaries.createPopupTemplate({
             visibleFieldNames: new Set([
                 "STATE_NAME", 
@@ -106,7 +106,7 @@ require([
 
     stateSelectDropdown.addEventListener("change", (event) => {
         
-    updateRESTQuery(event.target.value, setState);
+        updateRESTQuery(event.target.value, setState);
 
     });
     
@@ -140,13 +140,14 @@ require([
             .then((queryResults) => {
                 stateQueryResult = queryResults;
                 setState(stateQueryResult.features[0].attributes.STATE_ABBR, stateQueryResult)
-            });
-        };
+        });
+    };
 
-        const renderCitiesToView = (state) => {
+    const renderCitiesToView = (state) => {
+    
         flCityPopulations.definitionExpression = `ST = '${state}'`
         flCityPopulations.visible = true
             
-        };
+    };
 
 });
