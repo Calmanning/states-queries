@@ -85,68 +85,42 @@ require([
         
     };
     
-    view.on("click", ({ mapPoint }) => {
-        queryStatesEditor({ mapPoint, stateSelected: null })
-        console.log(queryStatesEditor({ mapPoint, stateSelected: null }))
-    })
+    view.on("click", ({mapPoint}) => {
+    
+        statesQuery({ mapPoint, state: null }, updateStateQueryResult)
+        
+    });
 
     stateSelectDropdown.addEventListener("change", (event) => {
         
-    setState(event.target.value);
+    updateQuery(event.target.value, updateStateQueryResult);
+
     });
     
-
+    //TODO: get the popup and highlight working!
     // This is the event hub. This is what changes 'state'. It should remain in this file.
     const setState = (state, stateQueryResult) => {
-
+        console.log(state)
+        console.log(stateQueryResult)
         if(stateQueryResult){
             
             addStatePopup(stateQueryResult)
         };
 
-        if(stateQueryResult && 
-         stateQueryResult.features[0].attributes.STATE_ABBR === state) {
-         return
-         }
-
         updateStateDropdownSelector(state);
         
         getCitiesFromState(state);
-        
-        updateQuery(state, updateStateQueryResult);
-        
-        
+            
     };
     
     
-    // const updateQuery = (state) => {
-       
-    //     const stateQueryWhereClause = `STATE_ABBR = '${state}'`
-        
-    //     queryStatesEditor({stateQueryWhereClause, state});
-    // }
-        
-    // const queryStatesEditor = ({mapPoint, stateQueryWhereClause, state}) => {
-        
-    //     const queryTemplate = {
-    //         returnGeometry: true,
-    //         returnQueriedGeometry: true,
-    //         outFields: ["*"]
-    //     }
-        
-    //     let queryClauseAdjustment = (stateQueryWhereClause) 
-    //         ? queryTemplate.where = stateQueryWhereClause 
-    //         : queryTemplate.geometry = mapPoint
-    
-    //     statesQuery(queryTemplate, state)
-    // };
-    
-    
     let stateQueryResult = null;
+
     function updateStateQueryResult(callbackResponse){
+
         stateQueryResult = callbackResponse
-        console.log(stateQueryResult.features[0].attributes.STATE_ABBR)
-        setState(stateQueryResult.features[0].attributes.STATE_ABBR, stateQueryResult)
+
+        setState(callbackResponse.features[0].attributes.STATE_ABBR, stateQueryResult)
     }
 
 

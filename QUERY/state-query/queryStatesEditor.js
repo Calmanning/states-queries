@@ -1,5 +1,6 @@
 function queryStatesEditor({mapPoint, stateQueryWhereClause, state}, callback) {
-
+    console.log(mapPoint.x)
+    console.log(mapPoint.y)
 
     const queryTemplate = {
         
