@@ -16,15 +16,27 @@ require([
             outFields: ["*"]
         }
     );
+
+    const flCityPopulations = new FeatureLayer (
+         {
+             url: 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_Major_Cities/FeatureServer',
+             outfields: ["*"],
+             definitionExpression: "",
+             visible: false
+         }
+         );
         
     const map = new Map (
         {
             basemap: "arcgis-topographic",
-            layers: [flStateBoundaries, 
+            layers: [
+                    flStateBoundaries,
+                    flCityPopulations 
             ]
         }
     );
     map.add(flStateBoundaries, 0)
+    map.add(flCityPopulations, 1)
     
     const view = new MapView(
         {
@@ -72,70 +84,62 @@ require([
         }
         );
         
-    const addStatePopup = function highlight(queryResults) {
-        view.graphics.add(stateOutlineGraphic);
-        console.log(queryResults)
-        view.popup.open(
-            {
-                location: stateOutlineGraphic.geometry,
-                features: queryResults,
-                featureMenuOpen: true,
-            }
-        );
-        
-    };
+    
     
     view.on("click", ({mapPoint}) => {
     
-        statesQuery({ mapPoint, state: null }, updateStateQueryResult)
+        statesRESTQuery({ mapPoint, state: null }, setState)
         
     });
 
     stateSelectDropdown.addEventListener("change", (event) => {
         
-    updateQuery(event.target.value, updateStateQueryResult);
+    updateRESTQuery(event.target.value, setState);
 
     });
     
-    //TODO: get the popup and highlight working!
     // This is the event hub. This is what changes 'state'. It should remain in this file.
     const setState = (state, stateQueryResult) => {
         console.log(state)
-        console.log(stateQueryResult)
+        
+        
         if(stateQueryResult){
-            
-            addStatePopup(stateQueryResult)
+            console.log("test")
+            addStatePopup(stateQueryResult, stateOutlineGraphic)
         };
+
+        renderCitiesToView(state)
 
         updateStateDropdownSelector(state);
         
         getCitiesFromState(state);
+
+        queryStatesEditor(state, statesQuery)
             
     };
     
     
     let stateQueryResult = null;
 
-    function updateStateQueryResult(callbackResponse){
 
-        stateQueryResult = callbackResponse
+    const statesQuery = (query, state) => {
 
-        setState(callbackResponse.features[0].attributes.STATE_ABBR, stateQueryResult)
-    }
+        if(stateQueryResult && 
+           stateQueryResult.features[0].attributes.STATE_ABBR === state) {
+            return
+        };
 
+        flStateBoundaries.queryFeatures(query)
+            .then((queryResults) => {
+                stateQueryResult = queryResults;
+                setState(stateQueryResult.features[0].attributes.STATE_ABBR, stateQueryResult)
+            });
+        };
 
-    // const statesQuery = (query, state) => {
-
-    //     if(stateQueryResult && 
-    //        stateQueryResult.features[0].attributes.STATE_ABBR === state) {
-    //         return
-    //     };
-
-    //     flStateBoundaries.queryFeatures(query)
-    //         .then((queryResults) => {
-    //             stateQueryResult = queryResults;
-    //             setState(stateQueryResult.features[0].attributes.STATE_ABBR, stateQueryResult)
-    //         });
-    //     };
+        const renderCitiesToView = (state) => {
+        flCityPopulations.definitionExpression = `ST = '${state}'`
+        flCityPopulations.visible = true
+            
+        };
 
 });

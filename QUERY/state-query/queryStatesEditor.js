@@ -1,20 +1,19 @@
-function queryStatesEditor({mapPoint, stateQueryWhereClause, state}, callback) {
-    console.log(mapPoint.x)
-    console.log(mapPoint.y)
+function queryStatesEditor(state, statesQuery) {
 
     const queryTemplate = {
         
+        where: `STATE_ABBR = '${state}'`,
         returnGeometry: true,
         returnQueriedGeometry: true,
         outFields: ["*"]
     }
     
-    let queryClauseAdjustment = (stateQueryWhereClause) 
-        ? queryTemplate.where = stateQueryWhereClause 
-        : queryTemplate.geometry = mapPoint;
+    // let queryClauseAdjustment = (stateQueryWhereClause) 
+    //     ? queryTemplate.where = stateQueryWhereClause 
+    //     : queryTemplate.geometry = mapPoint;
 
-    queryTemplate.url = stateBoudariesLayerUrl;
+    // queryTemplate.url = stateBoudariesLayerUrl;
 
-    statesQuery(queryTemplate, callback)
+    statesQuery(queryTemplate, state)
 
     };

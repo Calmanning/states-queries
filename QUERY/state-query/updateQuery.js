@@ -1,8 +1,9 @@
-function updateQuery(state, callback) {
-        const stateQueryWhereClause = `STATE_ABBR = '${state}'`
+const updateRESTQuery = (state, callback) => {
+
+        const whereClause = `STATE_ABBR = '${state}'`
         
         
-        statesQuery({stateQueryWhereClause}, callback);
+        statesRESTQuery({whereClause}, callback);
     };
         
     
