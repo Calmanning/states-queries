@@ -1,3 +1,5 @@
+getAvailableStates()
+
 
 require([
         "esri/config",
