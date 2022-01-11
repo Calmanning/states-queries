@@ -1,5 +1,6 @@
 const cityListContainer = document.createElement("div")
-    cityListContainer.setAttribute("id", "cityList")  
+    
+cityListContainer.setAttribute("id", "cityList")  
     
 function getCityListHeadings(cityQueryResults){
         

@@ -81,13 +81,13 @@ require([
                 outline: {
                     color: [255, 255, 255],
                     width: 1
-                }
+                },
             }
         }
         );
         
     const addStatePopup = function highlight(queryResults) {
-       
+       console.log(queryResults)
         view.graphics.add(stateOutlineGraphic);
         
         view.popup.open(
@@ -103,7 +103,7 @@ require([
     view.on("click", ({mapPoint}) => {
     
         statesRESTQuery({ mapPoint, state: null }, setState)
-        
+            
     });
 
     stateSelectDropdown.addEventListener("change", (event) => {
@@ -115,6 +115,7 @@ require([
     // This is the event hub. This is what changes 'state'. It should remain in this file.
     const setState = (state, stateQueryResult) => {
                 
+
         if(stateQueryResult){
             addStatePopup(stateQueryResult)
         };
