@@ -1,5 +1,6 @@
 //Original version of the application. All aspects needed to run the application are located here.
 // left document here for reference. Currently serves no purpose.
+
 require([
         "esri/config",
         "esri/Map",
@@ -21,7 +22,7 @@ require([
          {
              url: 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_Major_Cities/FeatureServer',
              outfields: ["*"],
-             definitionExpression: ""
+             definitionExpression: "POPULATION >= 100000"
          }
          );
 
@@ -37,14 +38,12 @@ require([
     map.add(flCityPopulations, 1)
 
     
-    const viewBuilder =(viewToggle) => {
-        if(viewToggle){
-            view = new MapView(
+    const view = new MapView(
                 {
                     container: "viewDiv",
                     map: map,
                     center: [-112, 50], 
-                    zoom: 4, 
+                    zoom: 4,
                     popup: {
                         autoOpenEnabled: false,
                         dockEnabled: true,
@@ -56,20 +55,7 @@ require([
                     } 
                 }
             );
-        };
-    };
-    
-    //variable that dictates whether or not the mapView will render
-    let viewToggle = true
-    viewBuilder(viewToggle)
-    
-    if(viewToggle) {
-        
-        view.on("click", ({ mapPoint }) => {
-            queryStatesEditor({ mapPoint, stateSelected: null })
-        })
-    }
-
+       
     //the visibleFieldNames here determine what is shown in the popup. Which is currently displayed on the layerView
     flStateBoundaries.load().
         then(() => {
@@ -97,15 +83,6 @@ require([
         }
     );
     
-
-    const mapViewBtn = document.createElement("button");
-    mapViewBtn.setAttribute("id", "mapViewBtn");
-    mapViewBtn.innerHTML = (viewToggle) 
-        ? "MapView on" 
-        : "MapView off"
-    mapViewBtn.value = viewToggle
-    document.getElementById("btnDiv").append(mapViewBtn);
-
     //in it's current state, almost everything the stateSelectDropdown could be it's own separate file-component.
     const stateList = ["AK","CA","CO", "CT", "DE", "ME", "MI", "MT", "NY", "NV","OH", "OR", "PA", "UT", "WA"]
     
@@ -128,6 +105,42 @@ require([
     stateSelectDropdown.addEventListener("change", (event) => {
         
         setState(event.target.value);
+    });
+
+//TESTING Query based on extent
+
+    view.on("pointer-up", () => {
+        
+        const queryTemplate = {
+            where: 'POPULATION > 100000',
+            geometry:view.extent,
+            returnGeometry: true,
+            outFields: [
+                "FID",
+                "ST",
+                "NAME",
+                "POPULATION"
+            ]
+        }
+
+        queryCitiesByExtent(queryTemplate)
+        flCityPopulations.definitionExpression = `POPULATION >= 100000`
+
+    });
+
+    //need to add query call when the 'zoom' changes
+    view.on("")
+
+    const queryCitiesByExtent = (queryTemplate) => {
+        flCityPopulations.queryFeatures(queryTemplate).
+            then((queryResults) => {
+                console.log(queryResults)
+                getCityListHeadings(queryResults)
+        });
+    };
+
+    view.on("click", ({ mapPoint }) => {
+            queryStatesEditor({ mapPoint, stateSelected: null })
     });
 
     const getCityListHeadings = (cityQueryResults) => {
@@ -203,7 +216,7 @@ require([
         
     const filterCitiesByState = (state) => {
         
-        const filteredCitiesWhereClause = `ST = '${state}'`;   
+        const filteredCitiesWhereClause = `ST = '${state}' AND POPULATION >= 100000`;   
         
         flCityPopulations.definitionExpression = filteredCitiesWhereClause;        
         
@@ -214,7 +227,7 @@ require([
     const queryCitiesEditor = (filteredCitiesWhereClause) => {
         
         const queryTemplate = {
-            where: filteredCitiesWhereClause,
+            where: `${filteredCitiesWhereClause}`,
             outFields: [
                 "NAME",
                 "POPULATION"
@@ -254,6 +267,7 @@ require([
         };
 
     const queryFilteredCities = (queryTemplate) => {
+        console.log(queryTemplate)
         flCityPopulations.queryFeatures(queryTemplate).
             then((queryResults) => {
                 getCityListHeadings(queryResults)

@@ -1,9 +1,6 @@
 
 const url = `https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/USA_States_Generalized/FeatureServer/0/query`
-    
-
-
-
+   
 const statesRESTQuery = ({ mapPoint, whereClause }, callback) => {   
     
         let params = {
