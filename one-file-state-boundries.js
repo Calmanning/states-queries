@@ -12,6 +12,7 @@ require([
 
     esriConfig.apiKey = 'AAPK115d19ab66264ef1b7cdbdd54b6804f4whm-2t82h02UCQQ1zigAlbT-GPsbqzkH4Cd1xDjXtPoshgyibnsGBM4zg-eklxut'
     
+    // Establishing view and dependent Layers
     const flStateBoundaries = new FeatureLayer (
         {
             url: 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_States_Generalized/FeatureServer',
@@ -113,6 +114,50 @@ require([
        document.getElementById("table").append(cityListContainer);
        cityListContainer.innerHTML = `<thead><tr>${ containerHeadings }</tr></thead><tbody>${ cityList }</tbody>`
     };
+
+// View-dependent UI elements  
+    // the visibleFieldNames here determine what is shown in the popup. Which is currently displayed on the layerView
+    flStateBoundaries.load()
+    .then(() => {
+            flStateBoundaries.popupTemplate = flStateBoundaries.createPopupTemplate( {
+                visibleFieldNames: new Set( [
+                                            "STATE_NAME", 
+                                            "SUB_REGION", 
+                                            "STATE_ABBR", 
+                                            "POPULATION",
+                ]),
+            });
+        });
+    
+    const stateOutlineGraphic = new Graphic ( {
+            symbol: {
+                type: "simple-fill",
+                color: [173, 216, 230, 0.2],
+                outline: {
+                    color: [255, 255, 255],
+                    width: 1
+                }
+            }
+        }
+    );
+    
+    const addStateHighlight = (queryResults) => {
+        
+        view.graphics.add(stateOutlineGraphic);
+        
+        view.popup.open(
+            {
+                location: stateOutlineGraphic.geometry,
+                features: queryResults.features,
+                featureMenuOpen: true,
+            }
+        );
+
+    };
+
+    const removeStateHighlight = () => {
+        view.popup.close()
+    };
     
 // Event listeners
     view.on("click", ({ mapPoint }) => {
@@ -147,7 +192,7 @@ require([
     
     
 // State management    
-    //this function is the hub for updating state.
+    //this function is the hub for updating state and initiating queries.
     const setState = (state) => {
 
         if (stateQueryResult){
@@ -156,7 +201,7 @@ require([
 
         updateStateDropdownSelector(state);
 
-        filterCitiesByState(state);
+        filterRenderedCitites(state);
         
         updateQuery(state);
     };
@@ -172,87 +217,28 @@ require([
     const queryStatesEditor = ({ mapPoint, stateQueryWhereClause, state, }) => {
         
         const queryTemplate = {
+            where: stateQueryWhereClause || '1=1',
+            geometry: mapPoint ? mapPoint : null,
             returnGeometry: true,
             returnQueriedGeometry: true,
             outFields: ["*"],
         }
         
-        let queryClauseAdjustment = (stateQueryWhereClause) 
-            ? queryTemplate.where = stateQueryWhereClause 
-            : queryTemplate.geometry = mapPoint
+        // let queryClauseAdjustment = (stateQueryWhereClause) 
+        //     ? queryTemplate.where = stateQueryWhereClause 
+        //     : queryTemplate.geometry = mapPoint
     
         statesQuery(queryTemplate, state,)
     };
         
-    const filterCitiesByState = (state) => {
+    const filterRenderedCitites = (state) => {
         const filteredCitiesWhereClause = `ST = '${ state }' AND POPULATION >= 100000`;   
+
+        queryFilteredCities(filteredCitiesWhereClause);
         
-        queryCitiesEditor(filteredCitiesWhereClause);
     };
-
-    //the outFields listed here will effect the table display outcomes
-    const queryCitiesEditor = (filteredCitiesWhereClause) => {
         
-        const queryTemplate = {
-            where: `${ filteredCitiesWhereClause }`,
-            outFields: [
-                "NAME",
-                "ST",
-                "POPULATION"
-            ]
-        }
-        
-        queryFilteredCities(queryTemplate)
-    };
-    
-//View-dependent UI elements
-     
-    //the visibleFieldNames here determine what is shown in the popup. Which is currently displayed on the layerView
-    flStateBoundaries.load()
-    .then(() => {
-            flStateBoundaries.popupTemplate = flStateBoundaries.createPopupTemplate( {
-                visibleFieldNames: new Set( [
-                                            "STATE_NAME", 
-                                            "SUB_REGION", 
-                                            "STATE_ABBR", 
-                                            "POPULATION"
-                ]),
-            });
-        });
-    
-    const stateOutlineGraphic = new Graphic ( {
-            symbol: {
-                type: "simple-fill",
-                color: [173, 216, 230, 0.2],
-                outline: {
-                    color: [255, 255, 255],
-                    width: 1
-                }
-            }
-        }
-    );
-    
-    const addStateHighlight = (queryResults) => {
-        
-        view.graphics.add(stateOutlineGraphic);
-        
-        view.popup.open(
-            {
-                location: stateOutlineGraphic.geometry,
-                features: queryResults.features,
-                featureMenuOpen: true,
-            }
-        );
-
-    };
-
-    const removeStateHighlight = () => {
-        console.log(stateOutlineGraphic)
-
-        view.popup.close()
-    }
-    
-// global control indicator used to determine if statesQeury() has already been run.
+// global indicator/placeholder to determine if statesQeury() has already been run.
     let stateQueryResult = null;
 
 // Query operations on the feature layers
@@ -270,23 +256,35 @@ require([
             });
         };
     
-        const queryFilteredCities = (queryTemplate) => {
-        console.log(queryTemplate)
-        flCityPopulations.queryFeatures(queryTemplate)
-            .then((queryResults) => {
-                getCityListHeadings(queryResults)
+    //Using REST query to keep city data results independent of the view.
+    //the outFields listed here will effect the table display outcomes.
+    const queryFilteredCities = (filteredCitiesWhereClause) => {
+
+        const citiesFlURL = 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_Major_Cities/FeatureServer/0/query'
+
+        const params = {
+            where: `${ filteredCitiesWhereClause }`,
+            outFields: ['NAME', 'ST', 'POPULATION',].join(','),
+            f: 'json'
+        }
+
+        axios.get(citiesFlURL, {
+            params
+        })
+            .then((response) => {
+                getCityListHeadings(response.data)
         });
     };
 
     const queryCitiesByViewExtent = (queryTemplate) => {        
-        console.log(queryTemplate)
         flCityPopulations.queryFeatures(queryTemplate)
             .then((queryResults) => {
-                console.log(queryResults)
                 getCityListHeadings(queryResults)
         });
     };
 
+    //REST query to keep state information independent from the view.
+    //results from this query populate the state selector UI. 
     const queryAvailableStates = (() =>{
         
         const statesLayerUrl = "https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_States_Generalized/FeatureServer/0/query"
@@ -302,8 +300,6 @@ require([
             params 
         })
             .then((response) => {
-
-                console.log(response.data.features)
                 populateStateDropdownList(response.data.features)
             })
             .catch((err) => console.log(err))
