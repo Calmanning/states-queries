@@ -21,4 +21,3 @@ const statesRESTQuery = ({ mapPoint, whereClause }, callback) => {
         catch((err) => console.log(err))
         
 }
-    

@@ -124,7 +124,7 @@ require([
 
         updateStateDropdownSelector(state);
         
-        getCitiesFromState(state);
+        getCitiesData(state);
 
         queryStatesFeatureViewEditor(state, statesFeatureViewQuery)
             
