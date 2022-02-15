@@ -1,60 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-<link>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    
-    <link rel="stylesheet" href="./style.css">
-    </link>
-    <link rel="stylesheet" href="https://js.arcgis.com/4.21/esri/themes/light/main.css">
-    </link>
-    <link rel="stylesheet" href="https://s3-us-west-1.amazonaws.com/patterns.esri.com/files/calcite-web/1.2.5/css/calcite-web.min.css">
-    </link>
-    
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Sample Map Page</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://js.arcgis.com/4.21/esri/themes/light/main.css"></link>
+  <link rel="stylesheet" href="https://s3-us-west-1.amazonaws.com/patterns.esri.com/files/calcite-web/1.2.5/css/calcite-web.min.css"></link>
+  <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.0.0-beta.52/calcite.css">
 </head>
 <body>
-    <div id="appContainer">    
-        <div id="viewDiv" >           
+
+    <header class = "top-nav fade-in">
+      <div class = "grid-container">
+        <div class = "column-24">
+          <div class = "tablet-hide">
+            <a class = "esri-logo-link" href = "http://www.esri.com/">
+              <span class = "logo-img top-nav-title">
+                <img style="width:80px; height:30px" alt=""
+                  src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4NCIgaGVpZ2h0PSIzMCIgdmlld0JveD0iMCAwIDg0IDMwIj48cGF0aCBkPSJNNzcuMjc3LjVjLTEuNDggMC0yLjU1NCAxLjE3NS0yLjU1NCAyLjQ4OCAwIDEuMzE0IDEuMDc0IDIuNDkgMi41NTQgMi40OSAxLjQ4IDAgMi42MjItMS4wNzEgMi42MjItMi40OUM3OS44OTkgMS41NzIgNzguNzU2LjUgNzcuMjc3LjV6bS0xLjkxMyAyMy40MjZoMy44OTFWOC4zNTNoLTMuODkxdjE1LjU3M3pNNDAuNTE1IDcuOTY1Yy00LjcwMiAwLTguNDY1IDMuMjc1LTguNDY1IDguMTc0IDAgNC44OTggMy43NjMgOC4xNzcgOC40NjUgOC4xNzcgMi4xNDYgMCA0LjE2NS0uNjY3IDUuODUyLTIuMzFsLTIuNDU3LTIuNDU3Yy0uOTE2Ljk2NC0yLjA5MyAxLjY1MS0zLjc4IDEuNjUxLTIuMTc1IDAtMy45MjctMS4zOTctNC4xODgtMy42OThoMTEuODc1di0xLjA3YzAtNS40Mi0yLjk1LTguNDY3LTcuMzAyLTguNDY3em0tNC41NzMgNi42MTdjLjI5My0yLjI0IDEuNzIxLTMuNyA0LjAyMy0zLjcgMi40MzQgMCAzLjkyNiAxLjQzIDMuOTYgMy43aC03Ljk4M3ptMTcuMzA1LTEuODQ5YzAtMS4xNjkgMS4yMzMtMS42NTUgMi4yNzMtMS42NTUgMS4zMiAwIDIuMjkyLjU0NyAzLjAzNyAxLjU3N2wyLjQ3Ni0yLjQ3NGMtMS4yODItMS42LTMuNDA3LTIuMjE2LTUuNDE4LTIuMjE2LTMuMTQ3IDAtNi4yNjIgMS41NTUtNi4yNjIgNS4wMjggMCA1LjkzOCA4LjQwMyAzLjQwNiA4LjQwMyA2LjYxNyAwIDEuMjMzLTEuNDYgMS43ODQtMi41OTUgMS43ODQtMS42NSAwLTIuNjg3LS44MDYtMy42OS0xLjkwNWwtMi41MTUgMi41MTRjMS41OCAxLjcxMSAzLjYyIDIuMzEzIDUuOTc4IDIuMzEzIDMuMTc5IDAgNi43MTctMS4yOTkgNi43MTctNC45OTggMC02LjA2Ny04LjQwNC0zLjc5NS04LjQwNC02LjU4NXptMTQuMTUtMS45MTZoLS4wNjJWOC4zNTNoLTMuODkydjE1LjU3M2gzLjg5MnYtOC4zNGMwLS44NDIuNTE4LTMuOTI1IDQuMTg1LTMuOTI1LjU2NCAwIDEuMTI3LjExMiAxLjcxOC4yNTNsLjE1Mi0zLjcyNmMtLjQ1LS4xMjctLjkwMS0uMjIzLTEuMzgyLS4yMjMtMi4wNDYgMC0zLjc2NiAxLjA3LTQuNjEgMi44NTJ6TTE0LjY4MyAyLjc2NmMtMS4yMTctLjAzNy0xLjkzMi4xMi0yLjY1MS4yNi0uMjE2LS4wNTYtLjYyLjAwMy0uNjQzLjQ3MiAwIC4yNTIuMDguNDQ3LjI0LjU2Mi4xNTkuMTE0IDEuNDkzIDEuMSAyLjQ3MyAyLjE0Mi0uNDcuMDUyLS45OC4xMzgtMS41MDQuMjQ2LS41ODUtMS4yNjQtMi40NjUtLjExNC0zLjcxNC0uMDY0LS4xNDYuMDA2LS4yODYuMDI1LS40MzEuMDM1LS4xMzctMS4wNTYtLjIzNS0yLjE1LS4yMS0yLjkyIDEuNjE4LS45MTcgNC43NDgtMS41OTMgNi44NzQtMS42MjZsLjM3My0uMDFjLjMxMi0uMDAzLjMzNy0uMjUxLjA0My0uMjkxLTIuNjQxLS4zNjEtNC45MjkuMTczLTcuMjc5IDEuMTQ1QzUuODA4IDMuNzQ4IDIuNjk2IDYuMTIuOCAxMC41OTZjLS40NDQgMS4yNDctMi4yMTkgNy4xOTUuOTM1IDEyLjMgMi41NiA0LjE0MiA1Ljg1NSA2LjExMyA5Ljg4NyA2LjY3NiA0LjAyNC41NjEgNi4yMDcuMDc1IDguNzUyLTEuMDU1IDUuOTUxLTIuNjQyIDEwLjQ5Ni0xMi41NTkgNS45NS0xOS43NDctMS43OTQtMy4zMTktNi40OTUtNi4yMjktMTEuNjQxLTYuMDA0em0tMi4yNTkgNC42NDdhMTcuNzU0IDE3Ljc1NCAwIDAgMSAyLjM2Mi0uMzY4IDE1Ljc0MSAxNS43NDEgMCAwIDEgMS43NDggMi41NGMtLjgwNS4zOS0xLjg3OC42ODgtMi4zMTUgMS4zMTItLjE4MS4yNi0uMjI2LjYxMy0uMjMyLjk5NWEyMy41OSAyMy41OSAwIDAgMC0zLjg3NyAxLjI4NmMtLjQ1My0xLjMzMi0uODUtMi42Ni0xLjEyNC0zLjg0MiAxLjI5Ni0xLjIzNyAyLjgxMy0xLjQzOCAzLjQzOC0xLjkyM3ptNi42MSAxNS44OGMtLjM1NC4wMzgtLjcwNi4wODMtMS4wMTYuMTMtLjc3LjEyMS0xLjc2Mi4zNzktMi42ODUuNzIzLS41My0uODQzLTEuOTUtMi44OTEtMi42NjctNC40MzcgMS40NDItLjcwOSAzLjQ1Ny0xLjMwMyA1Ljc3NS0xLjQ0NC4xOS4zMy40LjY2LjY5Ljk1Ni43NTcuNzc0LS40NCAxLjg4My0uMDk2IDQuMDcyem0tOC42MDMtOS4xNGMxLjEyLS41MyAyLjMtLjk2OCAzLjU2LTEuMjg2LS4wMDguMzMzLS4wNDUuNjQ5LS4xODIuOTAzLS4xOTYuMzY2LS4xMDYgMS40MjguMTM0IDEuNzc1Ljc1NSAxLjA5OSAyLjAwOC40ODggMi45NTEuODgzLjQzMy4xODEuNzIxLjQ4Mi45NjQuODQtMS45NzQuMTI0LTMuOTEuNTg0LTUuNzA2IDEuNDEtLjkyMy0xLjk2LTEuNzItNC41MjQtMS43Mi00LjUyNHptLjgzMiA0LjkzOGMtLjA3LjAzMy0uMTQ1LjA3NC0uMjE3LjExYTQwLjgwMyA0MC44MDMgMCAwIDAtMy4yNTYtLjc4Yy0uOTk1LS4yMDQtMS4wMzEtLjE1LTIuMTUxLjE3NS0uMTYuMDQ2LS4zMTMuMDg4LS40NjIuMTMzYTM2LjE3IDM2LjE3IDAgMCAxLS40NDUtMS4yMDJjMS40MzYtMS4xMDYgMi44ODQtMi4wMzQgNC44MjEtMi45ODUuNSAxLjQ5MSAxLjIxNSAzLjQ4MyAxLjcxIDQuNTQ5em0uNzY4IDQuNTI4Yy4yOTMtLjc2NS41MjEtMS4zMzEuNjA1LTEuODkuNTY5Ljk1OCAxLjI0OCAyIDEuNzc0IDIuODE1LS44MTkuMzk3LTEuNzcyIDEuMDEtMi42NzIgMS42ODUuMDYyLTEuMDM3LjA4My0yLjA2NC4yOTMtMi42MXptNS4zMzQtMTQuNjM2Yy0uMDEuMDE0LS4wMjguMDI2LS4wNC4wNGEyMy4wNTcgMjMuMDU3IDAgMCAwLTEuMzc2LTIuMTExYzEuMDA3LS4wNjEgMi4yNDYtLjAwOCAzLjM3NC4xMDgtMS4wMTQuMzYzLTEuNDYxIDEuMjU0LTEuOTU4IDEuOTYzem0tOS4wMjggMS4wOTRjLjAxOS0uMDI2LjAzOS0uMDQ3LjA1Ny0uMDcyLjIzNCAxLjE4Mi41MTMgMi4xNi44ODYgMy41MTgtMS40MDIuNjE4LTMuODgxIDIuMTQ4LTQuOTc2IDIuOTcyLS4xOTgtLjUwMi0uNDA0LTEuMjE0LS41ODktMS45NDYuMjQ5LS43MzcuNzU4LTEuMjU0IDEuNDc2LTEuMzI1IDEuMjI4LS4xMjMgMi4yOC0xLjk1IDMuMTQ2LTMuMTQ3em0tNS40MS0xLjc4NEM0LjI0IDYuNDU1IDYuMDIzIDQuNjY2IDcuNjUgMy43NzNjLS4wMTYuNC4wODYgMS41NjcuMjE4IDIuNjkzLS41Ny4wNTctMS4xMzQuMTI4LTEuNjkyLjIxMWExMi4wODQgMTIuMDg0IDAgMCAwLTMuMTE1IDQuMDg4Yy0uMTE3LTEuMDU0LS4xNzgtMS45MzMtLjEzMy0yLjQ3MnpNMi4wNyA5LjczMXMuMDYyIDEuMDYuMTEzIDEuODMzYzAgMC0uNzgxLjg4Ni0xLjE4IDEuNTkuMTU5LTEuNDQzLjQ5OC0yLjE4NyAxLjA2Ny0zLjQyM3ptNy42NjQgMTguMzU2QzUuNjg4IDI2LjgyIDIuNjkgMjMuNDEgMS42MiAxOS44MzRhMTcuNDc1IDE3LjQ3NSAwIDAgMS0uNjUxLTYuNDczYy4wNTYuMDEuMTg2LjA3Mi4zOC4wMTcuMTM1LS4wOTMuNjE2LS40My45NTctLjcyOGwuMDE4LjEzMWMtLjIzLjg3LS4zNzEgMS43NzUtLjQgMi43MS4zNy4zOS44MDQgMS4wMzggMS4yODYgMS43MDctLjMxLjIzLS45MDUuNjQxLTEuMDQ1Ljc0MS0uNDEuMjkyLS40MDYuNzUzLS4xMTQgMS4wMTUuMTYxLjE0NC40OTIuMDg0LjYxMy0uMDEuMzU4LS4yODUuNjU2LS41MTMgMS4wNjYtLjc3LjE1LjM5My4yOTIuNzQ4LjQzIDEuMDg2LS4xNzUuMTg4LS4zLjQzNi0uMzQyLjc5OC0uMTM1IDEuMTcyLjk3OSAyLjA5MiAxLjkxOCAyLjM2LjAzNS4wMS4wNi4wMTQuMDk0LjAyMy4wNS4wNzYuMDk1LjE0Ny4xNDguMjI0LS40ODcuMzc4LS44Mi43NjUtMS4wNDkgMS4wNjMtLjEzMi4xNzItLjI4LjQzLS4xNi40ODEuMTIzLjA1LjUzNSAwIC43MTktLjAzNC40NjYtLjA5LjgyNi0uNjA2IDEuMTQ4LS43OTYuMzg3LjUzNCAxLjAxNyAxLjIyIDEuNjcyIDEuODguMDI5LjEyLjA1NS4yNDYuMDg4LjM1MS4xMjUuNDAzLjI5My44MDQuNDk1IDEuMTk2LjQ3MS4yMi45NjIuNDAyIDEuNDY0LjU2MWE4LjM0NCA4LjM0NCAwIDAgMC0uNjIyLjcyem0uOTg5LjMxM2MuMTU1LS4yMDMuMzEyLS40NTQuNTA1LS42MjYuNDY4LjMxLjk2OS42NjUgMS4zNjguODk0LS42MTUtLjA3LTEuMzM3LS4wODUtMS44NzMtLjI2OHptMy4xMTMuMzFzLTEuNjA0LTEuMDYyLTIuMDA5LTEuNDcxYy44MDMtLjY2NyAyLjEwMi0xLjQ1OSAzLjEyOC0xLjg4OS40MDIuNjMgMS43MjcgMi41MDcgMi4yNTggMy4xMTItLjk2My4xNjgtMi4zMS4yOTQtMy4zNzcuMjQ4ek0yMC41NCAyNy4yYy0uMjg2LjE4OS0xLjY2NC44MTQtMi4yMDQuOTg4YTIzLjQzIDIzLjQzIDAgMCAxLTIuNDQtMy4yMDJjLjg0NC0uMzU0IDIuMTQzLS42NyAzLjM0Ni0uODIuMTA5LjM0Mi4yNS43MDQuNDQ0IDEuMDk0LjE5LjM4Mi40MTEuNjYyLjY0OS44NTMuMDg1LS4wNTMuMTY0LS4xMTUuMjQ4LS4xNy0uMDA2LjQyLS4wMTguODQ2LS4wNDMgMS4yNTd6bS0uMzMtMjEuNDc3Yy0uMjctLjE3Mi0uNjA3LS4xMDgtLjQ2Ny4xOTMuMDUzLjExNy4yNTkuMzE0LjQyNy41MTItLjk4Ni0uMjcyLTMuNjA4LS40NzktNC44NTYtLjM2NC0uODE1LS45MTYtMS43NDQtMi4wMjgtMi44NjEtMi43NjUgNC45OTktLjMxMSA5LjQ5IDEuNzU2IDExLjQ3MyA0LjE4Ni0uNjYxLS4zNDQtMi4wODctLjgzNC0yLjY2Ny0uOTYzLS4zMTMtLjMxOS0uNzA4LS41OC0xLjA1LS44em0xLjA5NCAyMS4wNjVjLjAyMy0uNDA3LjA0LS45MjIuMDUzLTEuMzk2LjQ4Ny0uMzc4Ljk0Ni0uNzkgMS4zNy0xLjIzOC41NDcuMDYzIDEuMDk0LjE1NiAxLjQyNy4yNC0uNzQuOTM2LTEuNzYyIDEuNzE2LTIuODUgMi4zOTR6bTMuODI1LTMuNzI0Yy0uMTIuMjUzLS40MjguNjg4LS42MzMuODk0LS4zMTItLjEyNi0uNzgxLS4yNTgtMS4yNzItLjM3NS4wNzgtLjA5NC4xNjMtLjE4Mi4yNC0uMjc5LjI2OC0xLjc5Ni0uMzM4LTIuMzcuNDItNC4wMTRsLjE3Mi0uMzcxYy40MTguMTE4LjgxMi4yNDcgMS4xNTMuMzg2LjA0My42MTYuMDQgMi43MjgtLjA4IDMuNzU5em0tLjcwOC00LjkxN2MuMTk2LS40MDcuNDEyLS44NC42NDUtMS4yNy4wNjEuNTQ3LjEwNSAxLjA4LjEzMSAxLjU2M2E5LjI1NiA5LjI1NiAwIDAgMC0uNzc2LS4yOTN6bTIuMjE4IDEuMTI2bC0uMTk0Ljc1NmMtLjEzNy41MTUtLjU5MyAxLjczMi0uODMyIDIuMjIzLjA5MS0uNjYzLjE3MS0yLjM4NC4xNDgtMi43My4xNi4wNDkuNTAyLS4xNDcuNTU5LS4zNDEuMDU3LS4xOTUtLjU2NC0uNDk1LS41NjQtLjQ5NWEyMC43NDIgMjAuNzQyIDAgMCAwLS4xNzItMi43Yy4xNDItLjIzLjI4Ni0uNDUyLjQzNC0uNjU1YTEyLjA4MiAxMi4wODIgMCAwIDAtLjE4Ni0xLjU3NWMuMTI1LjA0MS4yNC4wNzQuMzIzLjA3NS4yODMuMDA0LjI4Mi0uMTkuMTkyLS4yOTgtLjA1OC0uMDctLjMyOC0uMjM4LS42NDMtLjQyYTEyLjAyIDEyLjAyIDAgMCAwLTIuNzgtNS4zMmMuNTMzLjIwMiAxLjIxNC40OCAxLjc1NC43NzQuNDEuNTE2IDEuNTg1IDEuNjc1IDIuMjEyIDQuOTIuNTY0IDIuOTIyLS4wNiA1LjE0My0uMjUxIDUuNzg2ek04MC44ODYgOC41OTd2LS4yNGgxLjIxOHYuMjRoLS40Njh2MS4xOTFoLS4yODNWOC41OTdoLS40Njd6bTEuODctLjI0bC4zNjUgMS4wMjUuMzY4LTEuMDI0aC40MDZ2MS40M2gtLjI2MlY4LjYzNGwtLjM5NiAxLjE1NGgtLjIyOWwtLjQtMS4xNTR2MS4xNTRoLS4yNjF2LTEuNDNoLjQwOXoiLz48L3N2Zz4="
+                  class="esri-header-logo-image">
+              </span>
+            </a>
+            <nav class="top-nav-list" role="navigation" aria-labelledby="topnav">
+              <!-- <a class="top-nav-link" href="#">Dashboard</a> -->
+              <a class="top-nav-link" href="#">Plans</a>
+              <a class="top-nav-link" href="#">Community</a>
+              <a class="top-nav-link" href="#">Docs</a>
+            </nav>
+    
+            <nav class="class-top-nav-list right" role="navigation" aria-labelledby="usernav">
+              <button class="icon-ui-search search-top-nav link-dark-gray js-search-toggle" href="#"
+                aria-label="Search">Search</button>
+              <a class="top-nav-link icon-ui-user margin-left-1" href="#">Sign In</a>
+            </nav>
+          </div>
+    
+          <div class="tablet-show top-nav-flex">
+            <nav class="top-nav-flex-list" role="navigation" aria-labelledby="topnav">
+              <a href="/" class="icon-ui-menu top-nav-link js-drawer-toggle" data-drawer="left">
+                <span class="phone-hide">Menu</span>
+              </a>
+            </nav>
+
+            <header class="top-nav-flex-title">
+              <a href="/" class="top-nav-link">
+                <img style="width:80px; height:30px" alt=""
+                  src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4NCIgaGVpZ2h0PSIzMCIgdmlld0JveD0iMCAwIDg0IDMwIj48cGF0aCBkPSJNNzcuMjc3LjVjLTEuNDggMC0yLjU1NCAxLjE3NS0yLjU1NCAyLjQ4OCAwIDEuMzE0IDEuMDc0IDIuNDkgMi41NTQgMi40OSAxLjQ4IDAgMi42MjItMS4wNzEgMi42MjItMi40OUM3OS44OTkgMS41NzIgNzguNzU2LjUgNzcuMjc3LjV6bS0xLjkxMyAyMy40MjZoMy44OTFWOC4zNTNoLTMuODkxdjE1LjU3M3pNNDAuNTE1IDcuOTY1Yy00LjcwMiAwLTguNDY1IDMuMjc1LTguNDY1IDguMTc0IDAgNC44OTggMy43NjMgOC4xNzcgOC40NjUgOC4xNzcgMi4xNDYgMCA0LjE2NS0uNjY3IDUuODUyLTIuMzFsLTIuNDU3LTIuNDU3Yy0uOTE2Ljk2NC0yLjA5MyAxLjY1MS0zLjc4IDEuNjUxLTIuMTc1IDAtMy45MjctMS4zOTctNC4xODgtMy42OThoMTEuODc1di0xLjA3YzAtNS40Mi0yLjk1LTguNDY3LTcuMzAyLTguNDY3em0tNC41NzMgNi42MTdjLjI5My0yLjI0IDEuNzIxLTMuNyA0LjAyMy0zLjcgMi40MzQgMCAzLjkyNiAxLjQzIDMuOTYgMy43aC03Ljk4M3ptMTcuMzA1LTEuODQ5YzAtMS4xNjkgMS4yMzMtMS42NTUgMi4yNzMtMS42NTUgMS4zMiAwIDIuMjkyLjU0NyAzLjAzNyAxLjU3N2wyLjQ3Ni0yLjQ3NGMtMS4yODItMS42LTMuNDA3LTIuMjE2LTUuNDE4LTIuMjE2LTMuMTQ3IDAtNi4yNjIgMS41NTUtNi4yNjIgNS4wMjggMCA1LjkzOCA4LjQwMyAzLjQwNiA4LjQwMyA2LjYxNyAwIDEuMjMzLTEuNDYgMS43ODQtMi41OTUgMS43ODQtMS42NSAwLTIuNjg3LS44MDYtMy42OS0xLjkwNWwtMi41MTUgMi41MTRjMS41OCAxLjcxMSAzLjYyIDIuMzEzIDUuOTc4IDIuMzEzIDMuMTc5IDAgNi43MTctMS4yOTkgNi43MTctNC45OTggMC02LjA2Ny04LjQwNC0zLjc5NS04LjQwNC02LjU4NXptMTQuMTUtMS45MTZoLS4wNjJWOC4zNTNoLTMuODkydjE1LjU3M2gzLjg5MnYtOC4zNGMwLS44NDIuNTE4LTMuOTI1IDQuMTg1LTMuOTI1LjU2NCAwIDEuMTI3LjExMiAxLjcxOC4yNTNsLjE1Mi0zLjcyNmMtLjQ1LS4xMjctLjkwMS0uMjIzLTEuMzgyLS4yMjMtMi4wNDYgMC0zLjc2NiAxLjA3LTQuNjEgMi44NTJ6TTE0LjY4MyAyLjc2NmMtMS4yMTctLjAzNy0xLjkzMi4xMi0yLjY1MS4yNi0uMjE2LS4wNTYtLjYyLjAwMy0uNjQzLjQ3MiAwIC4yNTIuMDguNDQ3LjI0LjU2Mi4xNTkuMTE0IDEuNDkzIDEuMSAyLjQ3MyAyLjE0Mi0uNDcuMDUyLS45OC4xMzgtMS41MDQuMjQ2LS41ODUtMS4yNjQtMi40NjUtLjExNC0zLjcxNC0uMDY0LS4xNDYuMDA2LS4yODYuMDI1LS40MzEuMDM1LS4xMzctMS4wNTYtLjIzNS0yLjE1LS4yMS0yLjkyIDEuNjE4LS45MTcgNC43NDgtMS41OTMgNi44NzQtMS42MjZsLjM3My0uMDFjLjMxMi0uMDAzLjMzNy0uMjUxLjA0My0uMjkxLTIuNjQxLS4zNjEtNC45MjkuMTczLTcuMjc5IDEuMTQ1QzUuODA4IDMuNzQ4IDIuNjk2IDYuMTIuOCAxMC41OTZjLS40NDQgMS4yNDctMi4yMTkgNy4xOTUuOTM1IDEyLjMgMi41NiA0LjE0MiA1Ljg1NSA2LjExMyA5Ljg4NyA2LjY3NiA0LjAyNC41NjEgNi4yMDcuMDc1IDguNzUyLTEuMDU1IDUuOTUxLTIuNjQyIDEwLjQ5Ni0xMi41NTkgNS45NS0xOS43NDctMS43OTQtMy4zMTktNi40OTUtNi4yMjktMTEuNjQxLTYuMDA0em0tMi4yNTkgNC42NDdhMTcuNzU0IDE3Ljc1NCAwIDAgMSAyLjM2Mi0uMzY4IDE1Ljc0MSAxNS43NDEgMCAwIDEgMS43NDggMi41NGMtLjgwNS4zOS0xLjg3OC42ODgtMi4zMTUgMS4zMTItLjE4MS4yNi0uMjI2LjYxMy0uMjMyLjk5NWEyMy41OSAyMy41OSAwIDAgMC0zLjg3NyAxLjI4NmMtLjQ1My0xLjMzMi0uODUtMi42Ni0xLjEyNC0zLjg0MiAxLjI5Ni0xLjIzNyAyLjgxMy0xLjQzOCAzLjQzOC0xLjkyM3ptNi42MSAxNS44OGMtLjM1NC4wMzgtLjcwNi4wODMtMS4wMTYuMTMtLjc3LjEyMS0xLjc2Mi4zNzktMi42ODUuNzIzLS41My0uODQzLTEuOTUtMi44OTEtMi42NjctNC40MzcgMS40NDItLjcwOSAzLjQ1Ny0xLjMwMyA1Ljc3NS0xLjQ0NC4xOS4zMy40LjY2LjY5Ljk1Ni43NTcuNzc0LS40NCAxLjg4My0uMDk2IDQuMDcyem0tOC42MDMtOS4xNGMxLjEyLS41MyAyLjMtLjk2OCAzLjU2LTEuMjg2LS4wMDguMzMzLS4wNDUuNjQ5LS4xODIuOTAzLS4xOTYuMzY2LS4xMDYgMS40MjguMTM0IDEuNzc1Ljc1NSAxLjA5OSAyLjAwOC40ODggMi45NTEuODgzLjQzMy4xODEuNzIxLjQ4Mi45NjQuODQtMS45NzQuMTI0LTMuOTEuNTg0LTUuNzA2IDEuNDEtLjkyMy0xLjk2LTEuNzItNC41MjQtMS43Mi00LjUyNHptLjgzMiA0LjkzOGMtLjA3LjAzMy0uMTQ1LjA3NC0uMjE3LjExYTQwLjgwMyA0MC44MDMgMCAwIDAtMy4yNTYtLjc4Yy0uOTk1LS4yMDQtMS4wMzEtLjE1LTIuMTUxLjE3NS0uMTYuMDQ2LS4zMTMuMDg4LS40NjIuMTMzYTM2LjE3IDM2LjE3IDAgMCAxLS40NDUtMS4yMDJjMS40MzYtMS4xMDYgMi44ODQtMi4wMzQgNC44MjEtMi45ODUuNSAxLjQ5MSAxLjIxNSAzLjQ4MyAxLjcxIDQuNTQ5em0uNzY4IDQuNTI4Yy4yOTMtLjc2NS41MjEtMS4zMzEuNjA1LTEuODkuNTY5Ljk1OCAxLjI0OCAyIDEuNzc0IDIuODE1LS44MTkuMzk3LTEuNzcyIDEuMDEtMi42NzIgMS42ODUuMDYyLTEuMDM3LjA4My0yLjA2NC4yOTMtMi42MXptNS4zMzQtMTQuNjM2Yy0uMDEuMDE0LS4wMjguMDI2LS4wNC4wNGEyMy4wNTcgMjMuMDU3IDAgMCAwLTEuMzc2LTIuMTExYzEuMDA3LS4wNjEgMi4yNDYtLjAwOCAzLjM3NC4xMDgtMS4wMTQuMzYzLTEuNDYxIDEuMjU0LTEuOTU4IDEuOTYzem0tOS4wMjggMS4wOTRjLjAxOS0uMDI2LjAzOS0uMDQ3LjA1Ny0uMDcyLjIzNCAxLjE4Mi41MTMgMi4xNi44ODYgMy41MTgtMS40MDIuNjE4LTMuODgxIDIuMTQ4LTQuOTc2IDIuOTcyLS4xOTgtLjUwMi0uNDA0LTEuMjE0LS41ODktMS45NDYuMjQ5LS43MzcuNzU4LTEuMjU0IDEuNDc2LTEuMzI1IDEuMjI4LS4xMjMgMi4yOC0xLjk1IDMuMTQ2LTMuMTQ3em0tNS40MS0xLjc4NEM0LjI0IDYuNDU1IDYuMDIzIDQuNjY2IDcuNjUgMy43NzNjLS4wMTYuNC4wODYgMS41NjcuMjE4IDIuNjkzLS41Ny4wNTctMS4xMzQuMTI4LTEuNjkyLjIxMWExMi4wODQgMTIuMDg0IDAgMCAwLTMuMTE1IDQuMDg4Yy0uMTE3LTEuMDU0LS4xNzgtMS45MzMtLjEzMy0yLjQ3MnpNMi4wNyA5LjczMXMuMDYyIDEuMDYuMTEzIDEuODMzYzAgMC0uNzgxLjg4Ni0xLjE4IDEuNTkuMTU5LTEuNDQzLjQ5OC0yLjE4NyAxLjA2Ny0zLjQyM3ptNy42NjQgMTguMzU2QzUuNjg4IDI2LjgyIDIuNjkgMjMuNDEgMS42MiAxOS44MzRhMTcuNDc1IDE3LjQ3NSAwIDAgMS0uNjUxLTYuNDczYy4wNTYuMDEuMTg2LjA3Mi4zOC4wMTcuMTM1LS4wOTMuNjE2LS40My45NTctLjcyOGwuMDE4LjEzMWMtLjIzLjg3LS4zNzEgMS43NzUtLjQgMi43MS4zNy4zOS44MDQgMS4wMzggMS4yODYgMS43MDctLjMxLjIzLS45MDUuNjQxLTEuMDQ1Ljc0MS0uNDEuMjkyLS40MDYuNzUzLS4xMTQgMS4wMTUuMTYxLjE0NC40OTIuMDg0LjYxMy0uMDEuMzU4LS4yODUuNjU2LS41MTMgMS4wNjYtLjc3LjE1LjM5My4yOTIuNzQ4LjQzIDEuMDg2LS4xNzUuMTg4LS4zLjQzNi0uMzQyLjc5OC0uMTM1IDEuMTcyLjk3OSAyLjA5MiAxLjkxOCAyLjM2LjAzNS4wMS4wNi4wMTQuMDk0LjAyMy4wNS4wNzYuMDk1LjE0Ny4xNDguMjI0LS40ODcuMzc4LS44Mi43NjUtMS4wNDkgMS4wNjMtLjEzMi4xNzItLjI4LjQzLS4xNi40ODEuMTIzLjA1LjUzNSAwIC43MTktLjAzNC40NjYtLjA5LjgyNi0uNjA2IDEuMTQ4LS43OTYuMzg3LjUzNCAxLjAxNyAxLjIyIDEuNjcyIDEuODguMDI5LjEyLjA1NS4yNDYuMDg4LjM1MS4xMjUuNDAzLjI5My44MDQuNDk1IDEuMTk2LjQ3MS4yMi45NjIuNDAyIDEuNDY0LjU2MWE4LjM0NCA4LjM0NCAwIDAgMC0uNjIyLjcyem0uOTg5LjMxM2MuMTU1LS4yMDMuMzEyLS40NTQuNTA1LS42MjYuNDY4LjMxLjk2OS42NjUgMS4zNjguODk0LS42MTUtLjA3LTEuMzM3LS4wODUtMS44NzMtLjI2OHptMy4xMTMuMzFzLTEuNjA0LTEuMDYyLTIuMDA5LTEuNDcxYy44MDMtLjY2NyAyLjEwMi0xLjQ1OSAzLjEyOC0xLjg4OS40MDIuNjMgMS43MjcgMi41MDcgMi4yNTggMy4xMTItLjk2My4xNjgtMi4zMS4yOTQtMy4zNzcuMjQ4ek0yMC41NCAyNy4yYy0uMjg2LjE4OS0xLjY2NC44MTQtMi4yMDQuOTg4YTIzLjQzIDIzLjQzIDAgMCAxLTIuNDQtMy4yMDJjLjg0NC0uMzU0IDIuMTQzLS42NyAzLjM0Ni0uODIuMTA5LjM0Mi4yNS43MDQuNDQ0IDEuMDk0LjE5LjM4Mi40MTEuNjYyLjY0OS44NTMuMDg1LS4wNTMuMTY0LS4xMTUuMjQ4LS4xNy0uMDA2LjQyLS4wMTguODQ2LS4wNDMgMS4yNTd6bS0uMzMtMjEuNDc3Yy0uMjctLjE3Mi0uNjA3LS4xMDgtLjQ2Ny4xOTMuMDUzLjExNy4yNTkuMzE0LjQyNy41MTItLjk4Ni0uMjcyLTMuNjA4LS40NzktNC44NTYtLjM2NC0uODE1LS45MTYtMS43NDQtMi4wMjgtMi44NjEtMi43NjUgNC45OTktLjMxMSA5LjQ5IDEuNzU2IDExLjQ3MyA0LjE4Ni0uNjYxLS4zNDQtMi4wODctLjgzNC0yLjY2Ny0uOTYzLS4zMTMtLjMxOS0uNzA4LS41OC0xLjA1LS44em0xLjA5NCAyMS4wNjVjLjAyMy0uNDA3LjA0LS45MjIuMDUzLTEuMzk2LjQ4Ny0uMzc4Ljk0Ni0uNzkgMS4zNy0xLjIzOC41NDcuMDYzIDEuMDk0LjE1NiAxLjQyNy4yNC0uNzQuOTM2LTEuNzYyIDEuNzE2LTIuODUgMi4zOTR6bTMuODI1LTMuNzI0Yy0uMTIuMjUzLS40MjguNjg4LS42MzMuODk0LS4zMTItLjEyNi0uNzgxLS4yNTgtMS4yNzItLjM3NS4wNzgtLjA5NC4xNjMtLjE4Mi4yNC0uMjc5LjI2OC0xLjc5Ni0uMzM4LTIuMzcuNDItNC4wMTRsLjE3Mi0uMzcxYy40MTguMTE4LjgxMi4yNDcgMS4xNTMuMzg2LjA0My42MTYuMDQgMi43MjgtLjA4IDMuNzU5em0tLjcwOC00LjkxN2MuMTk2LS40MDcuNDEyLS44NC42NDUtMS4yNy4wNjEuNTQ3LjEwNSAxLjA4LjEzMSAxLjU2M2E5LjI1NiA5LjI1NiAwIDAgMC0uNzc2LS4yOTN6bTIuMjE4IDEuMTI2bC0uMTk0Ljc1NmMtLjEzNy41MTUtLjU5MyAxLjczMi0uODMyIDIuMjIzLjA5MS0uNjYzLjE3MS0yLjM4NC4xNDgtMi43My4xNi4wNDkuNTAyLS4xNDcuNTU5LS4zNDEuMDU3LS4xOTUtLjU2NC0uNDk1LS41NjQtLjQ5NWEyMC43NDIgMjAuNzQyIDAgMCAwLS4xNzItMi43Yy4xNDItLjIzLjI4Ni0uNDUyLjQzNC0uNjU1YTEyLjA4MiAxMi4wODIgMCAwIDAtLjE4Ni0xLjU3NWMuMTI1LjA0MS4yNC4wNzQuMzIzLjA3NS4yODMuMDA0LjI4Mi0uMTkuMTkyLS4yOTgtLjA1OC0uMDctLjMyOC0uMjM4LS42NDMtLjQyYTEyLjAyIDEyLjAyIDAgMCAwLTIuNzgtNS4zMmMuNTMzLjIwMiAxLjIxNC40OCAxLjc1NC43NzQuNDEuNTE2IDEuNTg1IDEuNjc1IDIuMjEyIDQuOTIuNTY0IDIuOTIyLS4wNiA1LjE0My0uMjUxIDUuNzg2ek04MC44ODYgOC41OTd2LS4yNGgxLjIxOHYuMjRoLS40Njh2MS4xOTFoLS4yODNWOC41OTdoLS40Njd6bTEuODctLjI0bC4zNjUgMS4wMjUuMzY4LTEuMDI0aC40MDZ2MS40M2gtLjI2MlY4LjYzNGwtLjM5NiAxLjE1NGgtLjIyOWwtLjQtMS4xNTR2MS4xNTRoLS4yNjF2LTEuNDNoLjQwOXoiLz48L3N2Zz4="
+                  class="esri-header-logo-image">
+                </span>
+              </a>
+            </header>
+            
+            <nav class="top-nav-flex-list text-right" role="navigation" aria-labelledby="usernav">
+              <button class="icon-ui-search phone-hide search-top-nav link-dark-gray js-search-toggle" href="#"
+                aria-label="Search">Search</button>
+              <button class="icon-ui-search icon-ui-flush phone-show search-top-nav link-dark-gray js-search-toggle"
+                href="#" aria-label="Search"></button>
+              <a class="top-nav-link icon-ui-user icon-ui-flush margin-left-1" href="#" aria-label="Sign In"><span
+                  class="margin-left-half phone-hide">Sign In</span>
+              </a>
+            </nav>
+          </div>
         </div>
-        <table id="table" class = "table table-striped">
-        </table>
+      </div>
+    </header>
+      
+    <div id="hero" class=" column-24" style="background-image: url('https://livingatlas.arcgis.com/landcover/48a87b29035daea52b362bd17105a12d.jpg')";>   
+      <div class="column-12">
+        <h1 class="font-size-8 padding-leader-4 text-white ">This is a Page</h1>
+        <p class="text-white font-size-1 animate-fade-in">It's a work in progress.</p>
+      </div>
     </div>
-    <div id="btnDiv">
-    </div>
-    <div id="selectorDiv" class = "select">
-    </div>
-    <!-- <div id="dataDiv">
-    </div> -->
-    <!-- <div id="searchDiv">
-    </div>
-    <div id="responseDiv">
-    </div> -->
+      
+    
 
-    <!-- Calcite-web CDN -->
-    <script src="https://s3-us-west-1.amazonaws.com/patterns.esri.com/files/calcite-web/1.2.5/js/calcite-web.min.js">
-    </script>
+   
+  
+  
 
+  <!-- Calcite-web CDN -->
+  <script src = "https://s3-us-west-1.amazonaws.com/patterns.esri.com/files/calcite-web/1.2.5/js/calcite-web.min.js"></script>
 </body>
 
 <!-- axios CDN -->
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src = "https://unpkg.com/axios/dist/axios.min.js"></script>
 <!-- ArcGIS JS API -->
-<script src="https://js.arcgis.com/4.21/"></script>
-<!-- Files for app -->
-<!-- <script src = "./REST/search.js"></script> -->
-<!-- <script src = "./UI/city-population-popUp.js"></script>
-<script src = "./UI/state-list-select-dropDown.js"></script>
-<script src = "./UI/state-list-select-events.js"></script>
-<script src = "QUERY/state-query/list-of-states-query.js"></script>
-<script src = "QUERY/state-query/updateQuery.js"></script>
-<script src = "QUERY/state-query/queryStatesEditor.js"></script>
-<script src = "QUERY/state-query/state-featureLayer-query-rest.js"></script>
-<script src = "QUERY/state-query/state-feature-view-query.js"></script>
-<script src = "QUERY/city-query/city-featureLayer-query-rest.js"></script> -->
-<!-- mapView script -->
-<!-- <script src = "./state-boundries.js"></script> -->
-<script src = "one-file-state-boundries.js"></script>
-
+<script src = "https://js.arcgis.com/4.21/"></script>
+<!-- javaScript -->
+<script src = 'map-page.js'></script>
 </html>
