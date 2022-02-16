@@ -8,9 +8,10 @@
   <title>Sample Map Page</title>
 
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href = "MAP-APPLICATION/style.css">
   <link rel="stylesheet" href="https://js.arcgis.com/4.21/esri/themes/light/main.css"></link>
   <link rel="stylesheet" href="https://s3-us-west-1.amazonaws.com/patterns.esri.com/files/calcite-web/1.2.5/css/calcite-web.min.css"></link>
-  <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.0.0-beta.52/calcite.css">
+ 
 </head>
 <body>
 
@@ -76,8 +77,119 @@
       </div>
     </div>
       
-    
+    <div class="grid-container">
+        <div class="column-14 padding-leader-6 padding-trailer-3 margin-left-4 padding-left-3 ">
+          <h2>TITLE SPACE</h2>  
+          <p>This would be where we right a small description to layout the premise of the product and it's page.</p>
+        </div>
+        <div class="column-24 light-gray">
+          <div class = "column-12 right tablet-left phone-left">
+            <img class = "content-img" src="https://ventdaily.com/wp-content/uploads/2019/10/140102100749-james-avery-uncle-phil-fresh-prince-horizontal-gallery.jpg";>
+          </div>
+          <div class="column-12 padding-leader-3 padding-trailer-3">
+            <h2>place words...um</h2>
+            <p>In this spot. Please. That would be nice.</p>
+          </div>
+        </div>
+        <div class="column-24">
+          <div class="column-12">
+            <img class="content-img" src="https://img.buzzfeed.com/buzzfeed-static/static/2018-06/21/13/asset/buzzfeed-prod-web-05/sub-buzz-13630-1529602200-4.jpg" ;>
+          </div>
+          <div class="column-12 padding-leader-3 padding-trailer-3">
+            <h2>place words...um</h2>
+            <p>In this spot. Please. That would be nice.</p>
+          </div>
+        </div>
+    </div>
 
+    <div class="grid-container">
+      <div id="appContainer" >
+        <div id="viewDiv">
+          <div id="selectorDiv" class="select">
+          </div>
+        </div>
+        <table id="table" class="table table-striped">
+        </table>
+      </div>
+    </div>
+    
+    <footer class="footer leader-3">
+      <div class="grid-container">
+        <nav class="column-8">
+          <h6 class="font-size-5"><strong>esri</strong></h6>
+          <ul class="list-plain font-size--2">
+            <li><strong>Talk With Us</strong></li>
+            <li><a class="link-off-black" href="#">Contact Sales</a></li>
+            <li><a class="link-off-black" href="#">Contact Support</a></li>
+          </ul>
+          <p class="leader-1 font-size--2"><strong>Follow Us</strong></span></p>
+          <section class="footer-social-nav">
+            <a class="icon-social-twitter" href="https://twitter.com/Esri/"></a>
+            <a class="icon-social-facebook" href="https://www.facebook.com/esrigis/"></a>
+            <a class="icon-social-youtube" href="https://www.youtube.com/esrigis/"></a>
+            <a class="icon-social-github" href="http://esri.github.com/"></a>
+            <a class="icon-social-linkedin" href="https://www.linkedin.com/company/5311"></a>
+            <a class="icon-social-contact" href="http://www.esri.com/about-esri/contact/"></a>
+          </section>
+        </nav>
+    
+        <nav class="column-4 leader-1">
+          <h6 class="font-size--2"><strong>Arc<span>GIS</span></strong></h6>
+          <ul class="list-plain font-size--2">
+            <li><a class="link-off-black" href="#">About ArcGIS</a></li>
+            <li><a class="link-off-black" href="#">ArcGIS Desktop</a></li>
+            <li><a class="link-off-black" href="#">ArcGIS Server</a></li>
+            <li><a class="link-off-black" href="#">ArcGIS Online</a></li>
+            <li><a class="link-off-black" href="#">Apps</a></li>
+            <li><a class="link-off-black" href="#">How to Buy</a></li>
+          </ul>
+        </nav>
+        <nav class="column-4 leader-1">
+          <h6 class="font-size--2"><strong>Community</strong></h6>
+          <ul class="list-plain font-size--2">
+            <li><a class="link-off-black" href="#">Esri Community</a></li>
+            <li><a class="link-off-black" href="#">Events</a></li>
+            <li><a class="link-off-black" href="#">Education</a></li>
+            <li><a class="link-off-black" href="#">Early Adopters</a></li>
+            <li><a class="link-off-black" href="#">Developers</a></li>
+          </ul>
+        </nav>
+        <nav class="column-4 leader-1">
+          <h6 class="font-size--2"><strong>Understanding GIS</strong></h6>
+          <ul class="list-plain font-size--2">
+            <li><a class="link-off-black" href="#">What is GIS</a></li>
+            <li><a class="link-off-black" href="#">Training</a></li>
+            <li><a class="link-off-black" href="#">Events</a></li>
+            <li><a class="link-off-black" href="#">Insights</a></li>
+            <li><a class="link-off-black" href="#">Esri Press</a></li>
+          </ul>
+        </nav>
+        <nav class="column-4 leader-1">
+          <h6 class="font-size--2"><strong>Company</strong></h6>
+          <ul class="list-plain font-size--2">
+            <li><a class="link-off-black" href="#">About Esri</a></li>
+            <li><a class="link-off-black" href="#">Contact Us</a></li>
+            <li><a class="link-off-black" href="#">Careers</a></li>
+            <li><a class="link-off-black" href="#">Worldwide Distributors</a></li>
+            <li><a class="link-off-black" href="#">Partners</a></li>
+            <li><a class="link-off-black" href="#">Disaster Response Program</a></li>
+          </ul>
+        </nav>
+    
+        <div class="column-24">
+          <hr>
+          <div class="column-8">
+            <p>United States (English) <span class="icon-ui-globe"></span></p>
+          </div>
+          <div class="column-16 font-size--2">
+            <a class="link-off-black margin-right-4" href="#">Privacy</a>
+            <a class="link-off-black margin-right-4" href="#">Legal</a>
+            <a class="link-off-black margin-right-4" href="#">Site Map</a>
+            <a class="link-off-black margin-right-4" href="#">Terms and Conditions</a>
+          </div>
+        </div>
+      </div>
+    </footer>
    
   
   
@@ -91,5 +203,6 @@
 <!-- ArcGIS JS API -->
 <script src = "https://js.arcgis.com/4.21/"></script>
 <!-- javaScript -->
-<script src = 'map-page.js'></script>
+<script src="./MAP-APPLICATION/one-file-state-boundries.js"></script>
+<script src = 'page.js'></script>
 </html>

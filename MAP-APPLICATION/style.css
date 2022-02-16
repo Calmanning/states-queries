@@ -14,7 +14,7 @@ body {
 #appContainer {
   display: flex;
   flex-direction: column;
-  height: 52vw;
+  height: 60vw;
   width: 100vw;
 }
 

@@ -16,4 +16,10 @@ body {
   width: 100vw;
   max-width: 100vw;
   height: 30vw;
+  background-position: center;
+}
+
+.content-img {
+  height: 30vw;
+  background-position: center;
 }
