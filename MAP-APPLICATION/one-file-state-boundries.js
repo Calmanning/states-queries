@@ -63,7 +63,7 @@ require([
 // UI components 
     const stateSelectDropdown = document.createElement("select")
     stateSelectDropdown.setAttribute("id","stateSelector");
-    document.getElementById("appContainer").prepend(stateSelectDropdown);
+    document.getElementById("selectorDiv").prepend(stateSelectDropdown);
     
     const populateStateDropdownList = (list) => {
         

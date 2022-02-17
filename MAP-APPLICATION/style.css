@@ -1,6 +1,6 @@
 #appContainer {
-  display: flex;
-  flex-direction: column;
+  display: block;
+  /* flex-direction: column; */
   width: 100vw;
 }
 
@@ -9,12 +9,29 @@
   height: 60vw;
 }
 
+#selectorDiv {
+  position: absolute;
+  right: 2.5rem;
+}
+
+#stateSelector {
+  z-index: 5;
+  top: 1.5rem;
+  width: 3.5rem;
+}
+
 #table {
   display: block;
   width: 96vw;
   height: 35vw;
   padding: 0;
   overflow: scroll;
+}
+
+@media (max-width: 480px) {
+  #table {
+    height: 48vw;
+  }
 }
 
 #table thead {
@@ -27,16 +44,6 @@
 
 #table td {
   width: 30vw;
-}
-
-#stateSelector {
-  position: absolute;
-  z-index: 5;
-  /* position: relative;
-  position: fixed; */
-  top: 215vw;
-  left: 80vw;
-  width: 3.5rem;
 }
 
 #mapViewBtn {

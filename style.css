@@ -12,22 +12,20 @@ body {
   margin: 0 auto;
   width: 100vw;
   max-width: 100vw;
-  height: 30vw;
+  height: 35vw;
   background-position: center;
 }
-/* 
-.grid-container {
-  padding: 0;
-}
-
-.column-24 {
-  margin: auto 0;
-  padding: 0;
-  width: auto;
-} */
 
 .content-img {
   height: 30rem;
+  background-position: center;
+  background-size: cover;
+}
+
+@media (max-width: 480px) {
+  .content-img {
+    height: 10rem;
+  }
 }
 
 .body-column {
