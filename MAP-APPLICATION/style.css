@@ -1,33 +1,18 @@
-* {
-  font-family: Avenir Next;
-  font-size: 1em;
-}
-
-html,
-body {
-  width: 100vw;
-  margin: 0 auto;
-  padding: 0;
-  font-family: Avenir Next;
-}
-
 #appContainer {
   display: flex;
   flex-direction: column;
-  height: 60vw;
   width: 100vw;
 }
 
 #viewDiv {
-  width: 100vw;
+  width: 96vw;
   height: 60vw;
 }
 
 #table {
   display: block;
-  width: 100vw;
-  height: 30vw;
-  margin: 0 auto;
+  width: 96vw;
+  height: 35vw;
   padding: 0;
   overflow: scroll;
 }
@@ -46,9 +31,12 @@ body {
 
 #stateSelector {
   position: absolute;
-  top: 50px;
-  right: 50px;
-  width: 100px;
+  z-index: 5;
+  /* position: relative;
+  position: fixed; */
+  top: 215vw;
+  left: 80vw;
+  width: 3.5rem;
 }
 
 #mapViewBtn {

@@ -5,9 +5,6 @@
 
 html,
 body {
-  width: 100vw;
-  margin: 0 auto;
-  padding: 0;
   font-family: Avenir Next;
 }
 
@@ -18,8 +15,21 @@ body {
   height: 30vw;
   background-position: center;
 }
+/* 
+.grid-container {
+  padding: 0;
+}
+
+.column-24 {
+  margin: auto 0;
+  padding: 0;
+  width: auto;
+} */
 
 .content-img {
-  height: 30vw;
-  background-position: center;
+  height: 30rem;
+}
+
+.body-column {
+  background-color: #efefef;
 }

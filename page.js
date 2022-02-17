@@ -1,1 +1,1 @@
-console.log("map-page.js connected");
+console.log("page.js connected");
