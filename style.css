@@ -9,13 +9,13 @@
 html {
   margin: 0 auto;
 }
-body {
-  max-width: 1440px;
-}
 
 main {
   max-width: 100vw;
   width: 100vw;
+}
+
+.nav-hero-container {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -31,29 +31,33 @@ main {
   background-size: cover;
 }
 
-@media (min-width: 1440px) {
-  hero h3,
-  h5 {
-    max-width: 1440px;
-  }
-}
-
-#test {
+.test {
+  display: flex;
+  flex-direction: row;
   margin: 0 auto;
-  width: 50%;
   max-width: 100vw;
   background-color: #efefef;
 }
 
 @media (max-width: 768px) {
-  #test {
+  .test {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.half-page {
+  width: 50%;
+}
+
+@media (max-width: 768px) {
+  .half-page {
     width: 100vw;
-    height: 25vw;
   }
 }
 
 @media (max-width: 768px) {
-  #reverse-column {
+  .reverse-column {
     flex-direction: column-reverse;
   }
 }
@@ -61,32 +65,13 @@ main {
 .content-img {
   margin: 0;
   height: 30rem;
-  background-position: center;
+  background-position: 50%;
   background-size: cover;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .content-img {
     height: 10rem;
+    background-position-y: 20%;
   }
 }
-
-/* h3 {
-  display: block;
-  font-size: 1.17em;
-  margin-block-start: 1em;
-  margin-block-end: 1em;
-  margin-inline-start: 0px;
-  margin-inline-end: 0px;
-  font-weight: bold;
-}
-
-h5 {
-  display: block;
-  font-size: 0.83em;
-  margin-block-start: 1.67em;
-  margin-block-end: 1.67em;
-  margin-inline-start: 0px;
-  margin-inline-end: 0px;
-  font-weight: bold;
-} */
