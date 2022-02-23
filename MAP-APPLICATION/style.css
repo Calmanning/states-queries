@@ -1,16 +1,22 @@
 #appContainer {
-  /* display: block; */
   flex-direction: column;
-  width: 100vw;
+  /* width: 100vw; */
 }
 
 #viewDiv {
-  width: 100vw;
+  /* width: 100vw; */
+  position: relative;
   height: 60vw;
 }
 
 #selectorDiv {
   position: absolute;
+  right: 5.5rem;
+}
+
+#card-container {
+  position: absolute;
+  top: 10rem;
   right: 5.5rem;
 }
 
@@ -22,7 +28,7 @@
 
 #table {
   display: block;
-  width: 100vw;
+  /* width: 100vw; */
   height: 30vw;
   padding: 0;
   overflow: scroll;
@@ -90,8 +96,4 @@
   flex-direction: row;
   justify-content: space-around;
   align-items: flex-start;
-}
-
-.hidden {
-  display: none;
 }

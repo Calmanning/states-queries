@@ -21,14 +21,16 @@ require([
             outFields: ["*"],
         }
     );
-        
-     const flCityPopulations = new FeatureLayer (
-         {
-             url: 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_Major_Cities/FeatureServer',
-             outfields: ["*"],
-             definitionExpression: "POPULATION >= 100000",
-         }
-         );
+    
+    const popLimit = 100000
+
+    const flCityPopulations = new FeatureLayer (
+        {
+            url: 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_Major_Cities/FeatureServer',
+            outfields: ["*"],
+            definitionExpression: `POPULATION >= ${popLimit}`,
+        }
+        );
 
     const map = new Map (
         {
@@ -90,6 +92,7 @@ require([
             .join(" ")
         
         getCityListEntries(cityQueryResults, containerHeadings,)
+        createCardInfo(cityQueryResults, containerHeadings,)
     };
     
     const cityListContainer = document.createElement("table")
@@ -116,6 +119,35 @@ require([
        document.getElementById("table").append(cityListContainer);
        cityListContainer.innerHTML = `<thead><tr>${ containerHeadings }</tr></thead><tbody>${ cityList }</tbody>`
     };
+
+    const card = document.createElement("calcite-card")
+    // card.setAttribute("class", "card-container")
+    
+
+    const createCardInfo = (cityQueryResults, containerHeadings,) => {
+      const cityList = cityQueryResults.features.map((city) => {
+
+            let town = city.attributes.NAME
+    
+            let population  = city.attributes.POPULATION
+
+            return (
+                `
+                <calcite
+                  <span slot="title">${ city.attributes.ST }</span>
+                  <td>${ town }</td> 
+                  <td>${ population }</td>
+                  <div slot="footer-trailing">
+                    <calcite-button color="blue" id="card-icon-test-1"> Go to location
+                    </calcite-button>
+                  </div>
+                `
+            )
+        }).sort().join("");
+
+      document.getElementById("card-container").append(card);
+       card.innerHTML = `<thead><tr>${ containerHeadings }</tr></thead><tbody>${ cityList }</tbody>`       
+    }
 
 // View-dependent UI elements  
     // the visibleFieldNames here determine what is shown in the popup. Which is currently displayed on the layerView
@@ -174,7 +206,7 @@ require([
     watchUtils.whenTrue(view, "stationary", () => {
         if(view.extent) {
             const queryTemplate = {
-                where: 'POPULATION > 100000',
+                where: `POPULATION > ${popLimit}`,
                 geometry: view.extent,
                 returnGeometry: true,
                 returnQueriedGeometry: true,
@@ -239,7 +271,7 @@ require([
     };
         
     const filterRenderedCitites = (state) => {
-        const filteredCitiesWhereClause = `ST = '${ state }' AND POPULATION >= 100000`;   
+        const filteredCitiesWhereClause = `ST = '${ state }' AND POPULATION >= ${ popLimit }`;   
 
         queryFilteredCities(filteredCitiesWhereClause);
         
@@ -260,6 +292,7 @@ require([
             .then((queryResults) => {
                 stateQueryResult = queryResults;
                 setState(stateQueryResult.features[0].attributes.STATE_ABBR)
+          
             });
         };
     

@@ -1,7 +1,7 @@
 * {
   box-sizing: border-box;
   padding: 0;
-  margin: 0 auto;
+
   font-family: Avenir Next;
   font-size: 1em;
 }
@@ -15,11 +15,31 @@ main {
   width: 100vw;
 }
 
+header {
+  max-width: 1440px;
+}
+
+@media (min-width: 1440px) {
+  header {
+    width: 1440px;
+    margin: 0 auto;
+  }
+}
+
 .nav-hero-container {
+  margin: 0;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: space-between;
+}
+
+.width-limit {
+  width: 1440px;
+}
+
+.hero-spacing {
+  margin: 5vw 0;
 }
 
 #hero {
@@ -29,6 +49,14 @@ main {
   background-position: center;
   background: no-repeat;
   background-size: cover;
+}
+
+#hero-text {
+  display: block;
+  max-width: 1440px;
+  text-align: left;
+  margin: 0px auto;
+  padding: 5vw 1vw;
 }
 
 .test {
