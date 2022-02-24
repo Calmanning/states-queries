@@ -1,5 +1,5 @@
 //Original version of the application. All aspects needed to run the application are located here.
-// left document here for reference. Currently serves no purpose.
+
 
 console.log("conecting map")
 
@@ -8,13 +8,14 @@ require([
         "esri/Map",
         "esri/Graphic",
         "esri/views/MapView",
+        "esri/geometry/Point",
         "esri/layers/FeatureLayer",
         "esri/core/watchUtils",
-], (esriConfig, Map, Graphic, MapView, FeatureLayer, watchUtils) => {
+], (esriConfig, Map, Graphic, MapView, Point, FeatureLayer, watchUtils) => {
 
     esriConfig.apiKey = 'AAPK115d19ab66264ef1b7cdbdd54b6804f4whm-2t82h02UCQQ1zigAlbT-GPsbqzkH4Cd1xDjXtPoshgyibnsGBM4zg-eklxut'
     
-    // Establishing view and dependent Layers
+// Establishing view and dependent Layers
     const flStateBoundaries = new FeatureLayer (
         {
             url: 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_States_Generalized/FeatureServer',
@@ -60,7 +61,23 @@ require([
                         },
                     } 
                 }
-            );
+    );
+
+    const goto = (x, y) => {
+      const point = new Point ({
+        x: x,
+        y: y,
+        spatialReference: 3857
+      });
+
+      view.goTo({
+        center: point,
+        zoom:10,
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+    }
        
 // UI components 
     const stateSelectDropdown = document.createElement("select")
@@ -92,7 +109,6 @@ require([
             .join(" ")
         
         getCityListEntries(cityQueryResults, containerHeadings,)
-        createCardInfo(cityQueryResults, containerHeadings,)
     };
     
     const cityListContainer = document.createElement("table")
@@ -120,73 +136,67 @@ require([
        cityListContainer.innerHTML = `<thead><tr>${ containerHeadings }</tr></thead><tbody>${ cityList }</tbody>`
     };
 
-    const card = document.createElement("calcite-card")
-    // card.setAttribute("class", "card-container")
-    
-
-    const createCardInfo = (cityQueryResults, containerHeadings,) => {
+    const card = document.createElement("calcite-card");
+   
+    const createCardInfo = (cityQueryResults,) => {
       const cityList = cityQueryResults.features.map((city) => {
+            const st = city.attributes.ST
 
-            let town = city.attributes.NAME
+            const town = city.attributes.NAME
     
-            let population  = city.attributes.POPULATION
+            const population  = city.attributes.POPULATION
 
+            const location = city.geometry
             return (
-                `
-                <calcite
-                  <span slot="title">${ city.attributes.ST }</span>
-                  <td>${ town }</td> 
-                  <td>${ population }</td>
-                  <div slot="footer-trailing">
-                    <calcite-button color="blue" id="card-icon-test-1"> Go to location
-                    </calcite-button>
-                  </div>
-                `
-            )
-        }).sort().join("");
+                    `  
+                    <div slot = "message">
+                    <span>${ town }, ${st} </span> </br>
+                    <span> Population: ${ population }</span> 
+                    <div class = "butts" slot="footer-trailing">
+                      <button class = 'btn goto' value = "${location.x}, ${location.y}">Go to city</button>
+                    </div>
+                    </div>
+                    `
+                  )
+            }).sort().join("");
 
       document.getElementById("card-container").append(card);
-       card.innerHTML = `<thead><tr>${ containerHeadings }</tr></thead><tbody>${ cityList }</tbody>`       
-    }
+       card.innerHTML = `
+                          <span slot="title">${ cityQueryResults.features[0].attributes.ST }</span>
+                          <span slot="subtitle">City Populations</span>
+                          <calcite-block collapsible heading = "Cities" style = "max-height: 30vw; width: 30vw; overflow: auto;">
+                            <calcite-notice active>
+                              ${ cityList }  
+                            </calcite-notice active>
+                          </calcite-block>
+                         ` 
 
-// View-dependent UI elements  
-    // the visibleFieldNames here determine what is shown in the popup. Which is currently displayed on the layerView
-    flStateBoundaries.load()
-    .then(() => {
-            flStateBoundaries.popupTemplate = flStateBoundaries.createPopupTemplate( {
-                visibleFieldNames: new Set( [
-                                            "STATE_NAME", 
-                                            "SUB_REGION", 
-                                            "STATE_ABBR", 
-                                            "POPULATION",
-                ]),
-            });
-        });
+                         addBlockButtonEventListener()
+    }
     
     const stateOutlineGraphic = new Graphic ( {
+      geometry: {
+        type: "polygon",
+            },
             symbol: {
-                type: "simple-fill",
-                color: [173, 216, 230, 0.2],
-                outline: {
-                    color: [255, 255, 255],
-                    width: 1
-                }
+              type: "simple-fill",
+              color: [0, 160, 255, 0.4],
+              outline: {
+                  color: [0, 97, 155],
+                  width: 2
+              }
             }
         }
     );
     
     const addStateHighlight = (queryResults) => {
-        
-        view.graphics.add(stateOutlineGraphic);
-        
-        view.popup.open(
-            {
-                location: stateOutlineGraphic.geometry,
-                features: queryResults.features,
-                featureMenuOpen: true,
-            }
-        );
+      
+      stateOutlineGraphic.geometry.rings = null;
 
+      stateOutlineGraphic.geometry.rings = queryResults.features[0].geometry.rings;
+
+      view.graphics.add(stateOutlineGraphic);
+        
     };
 
     const removeStateHighlight = () => {
@@ -197,7 +207,7 @@ require([
   
     view.on('mouse-wheel', (event) => {
       event.stopPropagation();
-    })
+    });
 
     view.on("click", ({ mapPoint }) => {
             queryStatesEditor({ mapPoint, stateSelected: null, })
@@ -215,22 +225,30 @@ require([
                     "ST",
                     "POPULATION",
                 ],
-            }
+            };
             
-            removeStateHighlight()
+            // removeStateHighlight()
 
-            queryCitiesByViewExtent(queryTemplate) 
-        }
-    })
+            queryCitiesByViewExtent(queryTemplate); 
+        };
+    });
     
     stateSelectDropdown.addEventListener("change", (event) => {
-        
-        setState(event.target.value);
+      setState(event.target.value);
     });
 
-    
-    
-// State management    
+    const addBlockButtonEventListener = () => {
+      document.querySelectorAll(".goto").forEach(button => {           
+        button.addEventListener("click", (event) => {
+        const location = event.target.value.split(",");
+        console.log(location)
+        //query citylayer for value's location
+        goto(location[0], location[1]);
+        });
+      });
+    };
+
+    // State management    
     //this function is the hub for updating state and initiating queries.
     const setState = (state) => {
 
@@ -263,10 +281,6 @@ require([
             outFields: ["*"],
         }
         
-        // let queryClauseAdjustment = (stateQueryWhereClause) 
-        //     ? queryTemplate.where = stateQueryWhereClause 
-        //     : queryTemplate.geometry = mapPoint
-    
         statesQuery(queryTemplate, state,)
     };
         
@@ -313,6 +327,7 @@ require([
         })
             .then((response) => {
                 getCityListHeadings(response.data)
+                createCardInfo(response.data)
         });
     };
 

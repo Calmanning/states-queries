@@ -15,6 +15,8 @@
   <link rel="stylesheet"
     href="https://s3-us-west-1.amazonaws.com/patterns.esri.com/files/calcite-web/1.2.5/css/calcite-web.min.css">
   </link>
+  <script type="module" src="https://js.arcgis.com/calcite-components/1.0.0-beta.77/calcite.esm.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.0.0-beta.77/calcite.css" />
 
 </head>
 
@@ -132,17 +134,17 @@
 
 
   <div class="animate-fade-in" style="width: 100vw;">
-    <section class="text-center padding-leader-1 padding-trailer-1">
+    <section class="text-center padding-leader-1 padding-trailer-1" style="background-image: linear-gradient(#efefef, transparent); ">
       <h3>Below is a simple map application</h3>
     </section>
 
     <div id="appContainer">
       <div id="viewDiv" class="">
-        <div id="selectorDiv" class="select">
+        <div id="selectorDiv" class="select"></div>
+        <div id="card-container" class = "card-container">
         </div>
       </div>
-      <table id="table" class="table table-striped">
-      </table>
+      <table id="table" class="table table-striped"></table>
     </div>
   </div>
 
