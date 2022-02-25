@@ -1,23 +1,22 @@
 #appContainer {
   flex-direction: column;
-  /* width: 100vw; */
+  position: relative;
 }
 
 #viewDiv {
-  /* width: 100vw; */
   position: relative;
-  height: 60vw;
+  height: 45vw;
 }
 
 #selectorDiv {
   position: absolute;
-  right: 5.5rem;
+  right: 1rem;
 }
 
 #card-container {
   position: absolute;
-  top: 10rem;
-  right: 5.5rem;
+  bottom: 2rem;
+  right: 1rem;
 }
 
 #stateSelector {

@@ -79,6 +79,12 @@ require([
       })
     }
        
+    flCityPopulations.load().
+      then(() => {
+        const scrim = document.getElementById("loading");
+        scrim.style.visibility = "hidden"
+        
+    })
 // UI components 
     const stateSelectDropdown = document.createElement("select")
     stateSelectDropdown.setAttribute("id","stateSelector");
@@ -135,6 +141,18 @@ require([
        document.getElementById("table").append(cityListContainer);
        cityListContainer.innerHTML = `<thead><tr>${ containerHeadings }</tr></thead><tbody>${ cityList }</tbody>`
     };
+
+    //collapsable function on the table
+    const tableToggle = document.getElementById("collapsible");
+    const tableView = document.getElementById("table-view");
+
+    tableToggle.addEventListener("click", () => {
+      if(tableView.style.display === "block") {
+        tableView.style.display = "none";
+      } else {
+        tableView.style.display = "block";
+      }
+    })
 
     const card = document.createElement("calcite-card");
    
@@ -241,8 +259,6 @@ require([
       document.querySelectorAll(".goto").forEach(button => {           
         button.addEventListener("click", (event) => {
         const location = event.target.value.split(",");
-        console.log(location)
-        //query citylayer for value's location
         goto(location[0], location[1]);
         });
       });

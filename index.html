@@ -92,7 +92,7 @@
 
     </div>
 
-    <div class="" style="width: 100vw;">
+    <div class="" style="width: 99vw;">
       <section id = "hero-text" class="padding-leader-1 padding-trailer-1 margin-right-3">
         <h3 class="">TITLE SPACE</h3>
         <h5>And Then a Sub-title</h5>
@@ -101,7 +101,7 @@
           it's page.</p>
       </section>
     </div>
-    <div class="test">
+    <div class="content-row">
       <div class="content-img half-page"
         style="background-image: url('https://ventdaily.com/wp-content/uploads/2019/10/140102100749-james-avery-uncle-phil-fresh-prince-horizontal-gallery.jpg');">
       </div>
@@ -110,7 +110,7 @@
         <p>In this spot. Please. That would be nice.</p>
       </section>
     </div>
-    <div class="test reverse-column">
+    <div class="content-row reverse-column">
       <section class="half-page padding-leader-2 padding-trailer-3 padding-left-3">
         <h2>And another thing</h2>
         <p>Would go here. And there would be a nice little blurb about it.</p>
@@ -119,7 +119,7 @@
         style="background-image: url('https://media.cnn.com/api/v1/images/stellar/prod/150520144251-james-avery-restricted.jpg?q=w_3001,h_1688,x_0,y_0,c_fill/w_480');">
       </div>
     </div>
-    <div class="test">
+    <div class="content-row">
       <div class="half-page content-img"
         style="background-image: url('https://64.media.tumblr.com/b714214f2e75b19788dcd27ad122780b/tumblr_inline_oh3mgpRM8X1sacoli_400.jpg');">
       </div>
@@ -130,21 +130,31 @@
     </div>
   </main>
 
-
-
-
-  <div class="animate-fade-in" style="width: 100vw;">
+  <div class="animate-fade-in" style="width: 99vw;">
     <section class="text-center padding-leader-1 padding-trailer-1" style="background-image: linear-gradient(#efefef, transparent); ">
       <h3>Below is a simple map application</h3>
     </section>
 
     <div id="appContainer">
-      <div id="viewDiv" class="">
+      <calcite-scrim id = "loading" loading></calcite-scrim>
+      
+      <div id="viewDiv">
+        <calcite-modal active id="modal" scale="s" aria-labelledby="modal-title" docked>
+          <div slot="header" id="modal-title">Modal title</div>
+          <div slot="content">Modal content lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+            do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+            nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+          <calcite-button slot="primary" width="full">I understand</calcite-button>
+        </calcite-modal>
         <div id="selectorDiv" class="select"></div>
         <div id="card-container" class = "card-container">
         </div>
       </div>
-      <table id="table" class="table table-striped"></table>
+      <calcite-icon id = "collapsible" icon = "table" scale = "l" ></calcite-icon>
+      <div id ="table-view">
+      <table id="table" class="table table-striped">
+      </table>
+      </div>
     </div>
   </div>
 
