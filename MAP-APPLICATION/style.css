@@ -26,11 +26,12 @@
 }
 
 #table {
-  display: block;
+  /* display: block; */
   /* width: 100vw; */
   height: 30vw;
+  width: 30vw;
   padding: 0;
-  overflow: scroll;
+  overflow: hidden;
 }
 
 @media (max-width: 480px) {
@@ -69,7 +70,7 @@
 }
 
 #cityList {
-  width: 100vw;
+  width: 31vw;
   margin: 0 auto;
   padding: 0;
 }

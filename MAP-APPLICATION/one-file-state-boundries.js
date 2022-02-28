@@ -13,6 +13,8 @@ require([
         "esri/core/watchUtils",
 ], (esriConfig, Map, Graphic, MapView, Point, FeatureLayer, watchUtils) => {
 
+'use strict';
+
     esriConfig.apiKey = 'AAPK115d19ab66264ef1b7cdbdd54b6804f4whm-2t82h02UCQQ1zigAlbT-GPsbqzkH4Cd1xDjXtPoshgyibnsGBM4zg-eklxut'
     
 // Establishing view and dependent Layers
@@ -72,7 +74,7 @@ require([
 
       view.goTo({
         center: point,
-        zoom:10,
+        zoom:8,
       })
       .catch((error) => {
         console.log(error)
@@ -82,14 +84,16 @@ require([
     flCityPopulations.load().
       then(() => {
         const scrim = document.getElementById("loading");
-        scrim.style.visibility = "hidden"
-        
+        scrim.style.display = "none"
+      
     })
-// UI components 
+
+// UI components
     const stateSelectDropdown = document.createElement("select")
     stateSelectDropdown.setAttribute("id","stateSelector");
     document.getElementById("selectorDiv").prepend(stateSelectDropdown);
-    
+    let stateSelectChoices = []
+
     const populateStateDropdownList = (list) => {
         
         stateSelectChoices = list.map((entry) => {
@@ -97,12 +101,14 @@ require([
         });
         
         stateSelectDropdown.innerHTML = stateSelectChoices.sort();
+
+        return stateSelectChoices
     };  
 
     const updateStateDropdownSelector = (state) => {
         stateSelectDropdown.innerHTML = [
                 `<option>${ state }</option>`, 
-                ...stateSelectChoices
+                [...stateSelectChoices]
             ]
     }
 
@@ -154,43 +160,103 @@ require([
       }
     })
 
+    const cardContainerEl = document.getElementById("card-container");
     const card = document.createElement("calcite-card");
    
-    const createCardInfo = (cityQueryResults,) => {
+    const generateCityPopupInfo = (cityQueryResults,) => {
+      
+      const st = cityQueryResults.features[0].attributes.ST
+      
       const cityList = cityQueryResults.features.map((city) => {
-            const st = city.attributes.ST
+        
+        // const st = city.attributes.ST
 
-            const town = city.attributes.NAME
-    
-            const population  = city.attributes.POPULATION
+        const town = city.attributes.NAME
 
-            const location = city.geometry
-            return (
-                    `  
-                    <div slot = "message">
-                    <span>${ town }, ${st} </span> </br>
-                    <span> Population: ${ population }</span> 
-                    <div class = "butts" slot="footer-trailing">
-                      <button class = 'btn goto' value = "${location.x}, ${location.y}">Go to city</button>
-                    </div>
-                    </div>
-                    `
-                  )
-            }).sort().join("");
+        const population  = city.attributes.POPULATION
 
-      document.getElementById("card-container").append(card);
-       card.innerHTML = `
-                          <span slot="title">${ cityQueryResults.features[0].attributes.ST }</span>
-                          <span slot="subtitle">City Populations</span>
-                          <calcite-block collapsible heading = "Cities" style = "max-height: 30vw; width: 30vw; overflow: auto;">
-                            <calcite-notice active>
-                              ${ cityList }  
-                            </calcite-notice active>
-                          </calcite-block>
-                         ` 
-
-                         addBlockButtonEventListener()
+        const location = city.geometry
+        return (
+          `  
+          <div slot = "message">
+            <span>${ town }, ${st} </span> </br>
+            <span> Population: ${ population }</span> 
+            <div slot="footer-trailing">
+              <button class = 'btn goto' value = "${location.x}, ${location.y}">Go to city</button>
+            </div>
+          </div>
+          `
+        )
+        }).sort().join("");
+      
+      createPopup({ cityList, st })
     }
+
+    const createPopup = ({ cityList, st }) => { 
+      cardContainerEl.append(card);
+      card.innerHTML = 
+      `
+        <span slot="title">${ st }</span>
+        <span slot="subtitle">City Populations</span>
+        <calcite-block collapsible heading = "Cities" style = "max-height: 30vw; width: 30vw; overflow: auto;">
+          <calcite-notice active>
+            ${ cityList }  
+          </calcite-notice active>
+        </calcite-block>
+      ` 
+
+      addBlockButtonEventListener()
+  }
+
+  const blockSection = document.getElementById("block");
+
+  const generateCityCardInfo = (cityQueryResults) => {
+      
+      const st = cityQueryResults.features[0].attributes.ST
+      
+      const cityList = cityQueryResults.features.map((city) => {
+        console.log(city.attributes.NAME)
+        
+
+        const town = city.attributes.NAME
+
+        const population  = city.attributes.POPULATION
+
+        const location = city.geometry
+        return (
+          `  
+          <div  id = "block-card" class = "block panel trailer-half">
+            <div class = "card ">
+              <div class = "card-content ">
+                <span>${ town }, ${st} </span> </br>
+                <span> Population: ${ population }</span> 
+                <div slot="footer-trailing">
+                  <button class = 'btn goto' value = "${location.x}, ${location.y}">Go to city</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          `
+        )
+        }).sort().join("");
+      
+
+        createCard({ cityList, st })
+    }
+
+    const createCard = ({ cityList, st }) => {
+      
+      
+      blockSection.innerHTML = [
+        
+        `
+        ${ cityList }
+        `
+      ] 
+        
+        addBlockButtonEventListener()
+        
+      }
     
     const stateOutlineGraphic = new Graphic ( {
       geometry: {
@@ -206,6 +272,8 @@ require([
             }
         }
     );
+
+    
     
     const addStateHighlight = (queryResults) => {
       
@@ -216,13 +284,8 @@ require([
       view.graphics.add(stateOutlineGraphic);
         
     };
-
-    const removeStateHighlight = () => {
-        view.popup.close()
-    };
     
 // Event listeners
-  
     view.on('mouse-wheel', (event) => {
       event.stopPropagation();
     });
@@ -230,6 +293,11 @@ require([
     view.on("click", ({ mapPoint }) => {
             queryStatesEditor({ mapPoint, stateSelected: null, })
     });
+
+    view.on("click", (event) => {
+      cardContainerEl.innerHTML = ""
+    })
+    
     
     watchUtils.whenTrue(view, "stationary", () => {
         if(view.extent) {
@@ -244,8 +312,6 @@ require([
                     "POPULATION",
                 ],
             };
-            
-            // removeStateHighlight()
 
             queryCitiesByViewExtent(queryTemplate); 
         };
@@ -264,6 +330,7 @@ require([
       });
     };
 
+    
     // State management    
     //this function is the hub for updating state and initiating queries.
     const setState = (state) => {
@@ -343,7 +410,8 @@ require([
         })
             .then((response) => {
                 getCityListHeadings(response.data)
-                createCardInfo(response.data)
+                generateCityPopupInfo(response.data)
+                generateCityCardInfo(response.data)
         });
     };
 
