@@ -26,8 +26,9 @@
 }
 
 #table {
+  /* adjusted width to fit within the viewDiv */
   display: block;
-  width: 98vw;
+  width: 32vw;
   height: 30vw;
   padding: 0;
   overflow: auto;
@@ -95,4 +96,8 @@
   flex-direction: row;
   justify-content: space-around;
   align-items: flex-start;
+}
+
+.tableRow td :hover {
+  cursor: pointer;
 }

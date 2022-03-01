@@ -90,39 +90,31 @@ require([
     const stateOutlineGraphic = new Graphic ( {
       geometry: {
         type: "polygon",
-            },
-            symbol: {
-              type: "simple-fill",
-              color: [0, 160, 255, 0.4],
-              outline: {
-                  color: [0, 97, 155],
-                  width: 2,
-              }
-            }
+      },
+      symbol: {
+        type: "simple-fill",
+        color: [0, 160, 255, 0.4],
+        outline: {
+          color: [0, 97, 155],
+          width: 2,
         }
-    );
+      }
+    });
 
-    const goto = (x, y) => {
-      
-      const point = new Point (
-        {
-          x: x,
-          y: y,
-          spatialReference: 3857,
+    const cityOutlineGraphic = new Graphic ( {
+      geometry: {
+        type:'point',
+      },
+      symbol: {
+        type: "simple-marker",
+        outline: {
+          color: [255, 255, 255],
+          width: 2,
         }
-      )
+      }
+    });
 
-      view.goTo(
-        {
-          center: point,
-          zoom:8,
-        }
-      )
-        .catch((error) => {
-            console.log(error)
-        }
-      )
-    };
+    
 
 //METHODS
     //REST query to keep state information independent from the view.
@@ -182,15 +174,17 @@ require([
     const getCityListEntries = (cityQueryResults, containerHeadings,) => {
         let cityList = cityQueryResults.features.map((city) => {
             
-            let st = city.attributes.ST
+            const st = city.attributes.ST
 
-            let town = city.attributes.NAME
+            const town = city.attributes.NAME
     
-            let population  = city.attributes.POPULATION
+            const population  = city.attributes.POPULATION
+
+            const location = city.geometry
 
             return (
                 `<tr>
-                    <td>${ town }</td> 
+                    <td class = "tableRow" value="${location.x}, ${location.y}">${ town }</td> 
                     <td>${ st }</td> 
                     <td>${ population }</td>
                 </tr>`
@@ -200,6 +194,8 @@ require([
        document.getElementById("table").append(cityListContainer);
 
        cityListContainer.innerHTML = `<thead><tr>${ containerHeadings }</tr></thead><tbody>${ cityList }</tbody>`
+
+       addTableClickListener()
     };
 
     const generateCityPopupInfo = (cityQueryResults,) => {
@@ -291,14 +287,24 @@ require([
     
     const addStateHighlight = (queryResults) => {
       
+      if(stateOutlineGraphic.geometry.rings) {
       stateOutlineGraphic.geometry.rings = null;
-
+      }
       stateOutlineGraphic.geometry.rings = queryResults.features[0].geometry.rings;
 
       view.graphics.add(stateOutlineGraphic);
         
     };
 
+    const addCityHighlight = (point) => {
+      
+      cityOutlineGraphic.geometry = point;
+      
+      view.graphics.add(cityOutlineGraphic);
+
+    };
+
+      
     // State management    
     //this function is the hub for updating the state of the page and initiating related queries.
     const setState = (state) => {
@@ -343,8 +349,6 @@ require([
         
     };
         
-
-
     // Query operations on the view's feature layers
     const statesQuery = (query, state,) => {
 
@@ -390,6 +394,30 @@ require([
         });
     };
 
+  const goto = (x, y) => {
+      
+    const point = new Point (
+      {
+        x: x,
+        y: y,
+        spatialReference: 3857,
+      }
+    )
+      
+    addCityHighlight(point);
+
+    view.goTo(
+      {
+        center: point,
+        zoom:8,
+      }
+    )
+      .catch((error) => {
+          console.log(error)
+      }
+    );
+  };
+
 // EVENT LISTENERS
   //loading wheel during page load  
     flCityPopulations.load().
@@ -420,6 +448,19 @@ require([
         goto(location[0], location[1]);
         });
       });
+    };
+
+    const addTableClickListener = () => {
+        document.querySelectorAll(".tableRow").forEach(row => {
+          row.addEventListener("click", (event) => {
+            const location = event.target.attributes.value.value.split(",");
+
+            goto(location[0],location[1]);
+            
+            
+            
+          })
+      })
     };
 
     //View-dependent events
