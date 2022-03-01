@@ -121,7 +121,7 @@ header {
 }
 
 #table-view {
-  width: 30vw;
+  width: 98vw;
   display: none;
   overflow: hidden;
   transition: max-height 0.5s ease-out;

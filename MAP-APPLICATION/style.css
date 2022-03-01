@@ -26,12 +26,11 @@
 }
 
 #table {
-  /* display: block; */
-  /* width: 100vw; */
+  display: block;
+  width: 98vw;
   height: 30vw;
-  width: 30vw;
   padding: 0;
-  overflow: hidden;
+  overflow: auto;
 }
 
 @media (max-width: 480px) {
